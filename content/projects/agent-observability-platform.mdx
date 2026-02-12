@@ -1,0 +1,42 @@
+---
+slug: agent-observability-platform
+title: Agent Observability Platform
+summary: A production-focused observability layer for multi-agent workflows with traces, eval snapshots, and latency/cost diagnostics.
+status: ongoing
+startedAt: 2025-06-10
+updatedAt: 2026-01-28
+stack:
+  - next.js
+  - typescript
+  - postgres
+  - openai
+  - langgraph
+tags:
+  - agents
+  - observability
+  - saas
+aiFocus:
+  - agent-evals
+  - trace-analysis
+  - cost-optimization
+repoUrl: https://github.com/rakshan/agent-observability-platform
+liveUrl: https://agent-observability.example.com
+impact: Reduced triage time for failed agent runs by 45 percent in internal testing.
+role: Staff Engineer
+teamSize: 4
+featured: true
+---
+
+## Why this exists
+
+Agent pipelines fail in messy ways. Teams need a common way to inspect prompts, tool calls, and model outputs without digging through logs.
+
+## Current scope
+
+- Session-level traces with timeline drill-down
+- Evaluation snapshots for regression checks
+- Latency and token cost dashboards by workflow step
+
+## Next milestone
+
+Automated alerting for quality regressions in high-traffic flows.

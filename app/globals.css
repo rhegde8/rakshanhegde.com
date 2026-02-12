@@ -1,26 +1,128 @@
 @import "tailwindcss";
+@config "../tailwind.config.mjs";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --bg: #24283b;
+  --panel: #1f2335;
+  --text: #c0caf5;
+  --muted: #a9b1d6;
+  --accent-1: #7dcfff;
+  --accent-2: #bb9af7;
+  --success: #9ece6a;
+  --warning: #e0af68;
+  --danger: #f7768e;
+  --border: color-mix(in srgb, var(--muted) 30%, transparent);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent-1: var(--accent-1);
+  --color-accent-2: var(--accent-2);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-border: var(--border);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-code);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent-1) 50%, transparent);
+  color: var(--bg);
+}
+
+.surface-panel {
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--panel) 92%, #000), var(--panel));
+}
+
+.terminal-grid-bg {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--muted) 10%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--muted) 10%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 24px 24px;
+}
+
+.mdx-content {
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.mdx-content h1,
+.mdx-content h2,
+.mdx-content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.65rem;
+  color: color-mix(in srgb, var(--accent-1) 25%, var(--text));
+  letter-spacing: -0.015em;
+}
+
+.mdx-content p,
+.mdx-content ul,
+.mdx-content ol {
+  margin-bottom: 1rem;
+  color: color-mix(in srgb, var(--text) 95%, white);
+}
+
+.mdx-content a {
+  color: var(--accent-1);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.mdx-content code {
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--panel) 88%, black);
+  padding: 0.15rem 0.35rem;
+  font-family:
+    var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+.mdx-content pre {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--panel) 88%, black);
+  padding: 0.95rem;
+}
+
+.mdx-content pre code {
+  border: none;
+  background: transparent;
+  padding: 0;
 }

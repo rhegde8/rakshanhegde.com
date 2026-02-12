@@ -1,0 +1,40 @@
+---
+slug: rag-knowledge-orchestrator
+title: RAG Knowledge Orchestrator
+summary: A retrieval pipeline that combines hybrid search, chunk-level reranking, and source-grounded response synthesis.
+status: completed
+startedAt: 2024-09-14
+updatedAt: 2025-10-11
+completedAt: 2025-10-11
+stack:
+  - python
+  - fastapi
+  - typescript
+  - postgres
+  - qdrant
+tags:
+  - rag
+  - retrieval
+  - search
+aiFocus:
+  - retrieval-evals
+  - reranking
+  - grounding
+repoUrl: https://github.com/rakshan/rag-knowledge-orchestrator
+demoVideoUrl: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+caseStudyUrl: https://rakshanhegde.dev/projects/rag-knowledge-orchestrator
+impact: Increased answer citation rate from 61 percent to 93 percent.
+role: Lead Engineer
+teamSize: 3
+featured: true
+---
+
+## Architecture notes
+
+The pipeline uses lexical plus semantic retrieval before reranking. Every final answer includes citations, and each citation maps back to an indexed source chunk.
+
+## Quality strategy
+
+- Retrieval recall benchmarks
+- LLM-as-judge plus human review sampling
+- Weekly drift checks for stale knowledge

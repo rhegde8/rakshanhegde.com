@@ -1,0 +1,25 @@
+---
+slug: local-model-routing
+title: Routing Between Local and Hosted Models
+summary: Testing policy-based routing that sends low-risk prompts to local models and escalates uncertain cases to hosted APIs.
+updatedAt: 2025-10-29
+tags:
+  - local-inference
+  - model-routing
+  - cost
+hypothesis: Confidence-aware routing can preserve quality while reducing hosted API spend.
+findings: Hybrid routing reduced hosted calls by 41 percent with stable task completion in benchmark tasks.
+references:
+  - https://arxiv.org/abs/2401.12345
+featured: false
+---
+
+## Routing policy
+
+Requests are classified by risk and complexity. Lower-risk requests route to local models with fallback guards.
+
+## Guard condition sample
+
+```ts
+const shouldEscalate = confidence < 0.72 || containsSensitiveContext;
+```

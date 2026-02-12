@@ -1,0 +1,26 @@
+---
+slug: rag-eval-metrics
+title: Practical RAG Evaluation Metrics Beyond Exact Match
+summary: A comparison of retrieval and answer-level metrics that better correlate with user trust in production support systems.
+updatedAt: 2025-12-04
+tags:
+  - rag
+  - evals
+  - reliability
+hypothesis: Citation faithfulness and retrieval coverage outperform exact-match style grading for production UX.
+findings: Citation faithfulness plus retrieval recall@k gave the strongest alignment with reviewer judgments.
+references:
+  - https://arxiv.org/abs/2005.11401
+  - https://arxiv.org/abs/2208.03299
+featured: true
+---
+
+## Metric stack
+
+- Retrieval recall@k
+- Citation faithfulness score
+- Answer completeness rubric
+
+## Implementation note
+
+Combining automatic metrics with targeted human spot checks caught failures that single-score systems missed.

@@ -1,0 +1,32 @@
+---
+slug: agent-memory-strategies
+title: Agent Memory Strategies Under Latency Constraints
+summary: Investigating how short-term memory compression affects answer quality and action consistency in tool-using agents.
+updatedAt: 2026-01-18
+tags:
+  - agents
+  - memory
+  - latency
+hypothesis: Hierarchical summaries preserve enough context while cutting token usage for longer sessions.
+findings: Summary compression to 18 percent of original tokens retained acceptable task success and reduced latency spikes.
+references:
+  - https://arxiv.org/abs/2307.03172
+featured: true
+---
+
+## Context
+
+Long sessions increase prompt size and drift risk. This experiment compares rolling-window memory against hierarchical summarization.
+
+## Notes
+
+```ts
+type MemoryWindow = {
+  maxRecentTurns: number;
+  summaryTokenBudget: number;
+};
+```
+
+## Preliminary result
+
+Compression plus selective recall gives a better latency-quality tradeoff than naive truncation.

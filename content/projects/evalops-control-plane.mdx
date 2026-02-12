@@ -1,0 +1,37 @@
+---
+slug: evalops-control-plane
+title: EvalOps Control Plane
+summary: A control plane for managing prompt versions, offline evaluations, and release gates for LLM-backed features.
+status: ongoing
+startedAt: 2025-11-01
+updatedAt: 2026-02-02
+stack:
+  - next.js
+  - typescript
+  - node.js
+  - clickhouse
+tags:
+  - evals
+  - platform
+  - governance
+aiFocus:
+  - prompt-versioning
+  - release-evals
+  - regression-detection
+repoUrl: https://github.com/rakshan/evalops-control-plane
+liveUrl: https://evalops.example.com
+impact: Added repeatable release checks for model and prompt updates.
+role: Platform Lead
+teamSize: 5
+featured: true
+---
+
+## Problem statement
+
+Teams often ship prompt or model changes without objective quality checks. This project introduces a release policy layer with clear pass/fail thresholds.
+
+## Roadmap
+
+- Dataset quality scoring
+- Workflow templates for common product surfaces
+- CI-native quality reports for pull requests
