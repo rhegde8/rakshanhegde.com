@@ -1,5 +1,7 @@
 # Deployment Guide
 
+**Architecture, env var meanings, and security baseline:** see canonical **[`README.md`](../README.md)** and **`.env.example`**. This file is only the **deploy procedure** and post-deploy checks.
+
 ## Target
 
 - Hosting: Vercel Pro
@@ -10,15 +12,8 @@
 
 1. Import repository into Vercel.
 2. Configure framework preset as Next.js.
-3. Set environment variables for Production and Preview:
-   - `NEXT_PUBLIC_SITE_URL`
-   - `NEXT_PUBLIC_ENABLE_ANALYTICS`
-   - `NEXT_PUBLIC_ENABLE_CONTACT_FORM`
-   - `ENABLE_CONTACT_FORM`
-   - `CONTACT_FORM_WEBHOOK_URL` (if form enabled)
-   - `CONTACT_FORM_RATE_LIMIT_WINDOW_MS`
-   - `CONTACT_FORM_RATE_LIMIT_MAX`
-4. Enable Vercel Analytics for project.
+3. Set environment variables for Production and Preview to match **`README.md` → Environment variables** (and `.env.example`), including optional `SITE_USERNAME` / `SITE_PASSWORD` if you want Basic Auth on previews or production.
+4. Enable Vercel Analytics for the project if you use `NEXT_PUBLIC_ENABLE_ANALYTICS=true`.
 
 ## 2) Build and output checks
 

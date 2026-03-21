@@ -9,7 +9,7 @@ export function SiteFooter(): React.JSX.Element {
         <div className="text-muted flex flex-wrap items-center gap-3 text-sm">
           {siteConfig.socialLinks.map((link) => (
             <a
-              key={link.href}
+              key={link.label}
               href={link.href}
               target="_blank"
               rel="noreferrer"

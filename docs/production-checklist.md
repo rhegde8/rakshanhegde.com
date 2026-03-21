@@ -1,5 +1,7 @@
 # Production Checklist
 
+**Canonical stack, CI job name (`quality`), routes, and env reference:** **[`README.md`](../README.md)**. Use this file as a **checkbox runbook** only.
+
 ## Pre-launch quality
 
 - [ ] `pnpm typecheck` passes

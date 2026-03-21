@@ -102,7 +102,7 @@ export default function AboutPage(): React.JSX.Element {
           </a>
           {siteConfig.socialLinks.map((social) => (
             <a
-              key={social.href}
+              key={social.label}
               href={social.href}
               target="_blank"
               rel="noreferrer"
