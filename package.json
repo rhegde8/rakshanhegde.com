@@ -20,7 +20,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.6.1",
+    "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.34.0",
     "gray-matter": "^4.0.3",
     "next": "16.1.6",
