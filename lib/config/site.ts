@@ -5,7 +5,7 @@ export const siteConfig = {
   description:
     "Security engineer turned AI systems builder. Production-grade software with real opinions on reliability, eval-driven development, and what it takes to ship AI that doesn't embarrass you in prod.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://rakshanhegde.com",
-  location: "India",
+  location: "NYC, USA",
   email: "rakshan@rakshanhegde.com",
   terminalIntro: [
     "$ whoami",

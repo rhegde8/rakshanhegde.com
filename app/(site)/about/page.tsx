@@ -59,8 +59,7 @@ export default function AboutPage(): React.JSX.Element {
           </p>
           <p>
             Outside of work: I read a lot, run occasionally, and have strong opinions about terminal
-            setups. Based in India. Open to engineering, AI platform, and research collaboration
-            roles.
+            setups. Open to engineering, AI platform, and research collaboration roles.
           </p>
         </div>
       </section>
