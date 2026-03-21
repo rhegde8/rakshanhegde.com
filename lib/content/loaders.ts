@@ -4,13 +4,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { z } from "zod";
 
-import type {
-  ContentCollection,
-  DemoEntry,
-  ProjectEntry,
-  ResearchEntry,
-} from "@/lib/content/types";
-import { demoFrontmatterSchema } from "@/lib/schema/demo";
+import type { ContentCollection, ProjectEntry, ResearchEntry } from "@/lib/content/types";
 import { projectFrontmatterSchema } from "@/lib/schema/project";
 import { researchFrontmatterSchema } from "@/lib/schema/research";
 
@@ -73,13 +67,4 @@ export async function getAllResearchEntries(): Promise<ResearchEntry[]> {
 export async function getResearchBySlug(slug: string): Promise<ResearchEntry | null> {
   const researchEntries = await getAllResearchEntries();
   return researchEntries.find((entry) => entry.slug === slug) ?? null;
-}
-
-export async function getAllDemos(): Promise<DemoEntry[]> {
-  return readCollectionEntries("demos", demoFrontmatterSchema);
-}
-
-export async function getDemoBySlug(slug: string): Promise<DemoEntry | null> {
-  const demos = await getAllDemos();
-  return demos.find((demo) => demo.slug === slug) ?? null;
 }

@@ -11,7 +11,7 @@ export default function TermsPage(): React.JSX.Element {
   return (
     <div className="space-y-6">
       <SectionHeading title="Terms of Use" subtitle="Last updated: Feb 12, 2026" />
-      <article className="surface-panel mdx-content text-muted max-w-3xl space-y-4 p-5 text-sm">
+      <article className="mdx-content max-w-3xl space-y-4 border border-[#1e1e1e] bg-[#111111] p-5 text-sm text-[#6b7280]">
         <p>
           By using this website, you agree to use its content for lawful purposes. All project
           descriptions and research notes are provided for informational purposes and may evolve

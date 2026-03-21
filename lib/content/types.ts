@@ -1,8 +1,7 @@
-import type { DemoFrontmatter } from "@/lib/schema/demo";
 import type { ProjectFrontmatter } from "@/lib/schema/project";
 import type { ResearchFrontmatter } from "@/lib/schema/research";
 
-export type ContentCollection = "projects" | "research" | "demos";
+export type ContentCollection = "projects" | "research";
 
 type BaseEntry = {
   content: string;
@@ -11,4 +10,3 @@ type BaseEntry = {
 
 export type ProjectEntry = ProjectFrontmatter & BaseEntry;
 export type ResearchEntry = ResearchFrontmatter & BaseEntry;
-export type DemoEntry = DemoFrontmatter & BaseEntry;

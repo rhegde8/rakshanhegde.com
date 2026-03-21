@@ -51,14 +51,16 @@ export default async function ResearchDetailPage({
 
   return (
     <article className="space-y-6">
-      <Link href="/research" className="text-accent-1 text-sm hover:underline">
-        ← Back to research
+      <Link href="/research" className="font-mono text-xs text-[#00ff88] hover:underline">
+        ← back to research
       </Link>
 
-      <header className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight">{entry.title}</h1>
-        <p className="text-muted max-w-3xl text-sm sm:text-base">{entry.summary}</p>
-        <p className="text-muted text-xs">Updated {formatDate(entry.updatedAt)}</p>
+      <header className="space-y-3 border-l-2 border-l-[#00ff88] pl-4">
+        <h1 className="font-mono text-3xl font-semibold tracking-tight text-[#e2e8f0]">
+          {entry.title}
+        </h1>
+        <p className="max-w-3xl text-sm text-[#6b7280] sm:text-base">{entry.summary}</p>
+        <p className="font-mono text-xs text-[#6b7280]">updated {formatDate(entry.updatedAt)}</p>
         <div className="flex flex-wrap gap-1.5">
           {entry.tags.map((tag) => (
             <TagPill key={tag} label={tag} />

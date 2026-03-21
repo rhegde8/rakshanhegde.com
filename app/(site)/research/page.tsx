@@ -17,7 +17,7 @@ export default async function ResearchPage(): Promise<React.JSX.Element> {
   return (
     <div className="space-y-6">
       <SectionHeading
-        title="Research"
+        title="research log"
         subtitle="Irregular notes with hypotheses, experiment logs, and findings from real AI system work."
       />
       <JsonLdScript data={entries.map((entry) => buildResearchArticleJsonLd(entry))} />

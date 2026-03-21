@@ -18,24 +18,24 @@ export function ResearchCard({ entry }: ResearchCardProps): React.JSX.Element {
 
   return (
     <motion.article
-      {...(!shouldReduceMotion ? { whileHover: { y: -4 } } : {})}
+      {...(!shouldReduceMotion ? { whileHover: { x: 2 } } : {})}
       transition={{ duration: motionDurations.fast, ease: motionEasing }}
-      className="surface-panel flex h-full flex-col gap-4 p-4"
+      className="flex h-full flex-col gap-4 border border-l-[2px] border-[#1e1e1e] border-l-[#00ff88] bg-[#111111] p-5"
     >
       <header className="space-y-2">
-        <h3 className="text-text text-lg font-semibold">{entry.title}</h3>
-        <p className="text-muted text-sm">{entry.summary}</p>
+        <h3 className="font-mono text-base font-semibold text-[#e2e8f0]">{entry.title}</h3>
+        <p className="text-sm leading-relaxed text-[#6b7280]">{entry.summary}</p>
       </header>
 
       {entry.hypothesis ? (
-        <p className="text-muted text-xs">
-          <span className="text-accent-2 font-mono">hypothesis:</span> {entry.hypothesis}
+        <p className="text-xs text-[#6b7280]">
+          <span className="font-mono text-[#00ff88]">hypothesis:</span> {entry.hypothesis}
         </p>
       ) : null}
 
       {entry.findings ? (
-        <p className="text-muted text-xs">
-          <span className="text-success font-mono">findings:</span> {entry.findings}
+        <p className="text-xs text-[#6b7280]">
+          <span className="font-mono text-[#e2e8f0]">findings:</span> {entry.findings}
         </p>
       ) : null}
 
@@ -45,10 +45,10 @@ export function ResearchCard({ entry }: ResearchCardProps): React.JSX.Element {
         ))}
       </div>
 
-      <div className="text-muted mt-auto flex items-center justify-between pt-2 text-xs">
-        <span>Updated {formatDate(entry.updatedAt)}</span>
-        <Link href={`/research/${entry.slug}`} className="text-accent-1 hover:underline">
-          Read entry
+      <div className="mt-auto flex items-center justify-between pt-2 font-mono text-xs text-[#6b7280]">
+        <span>{formatDate(entry.updatedAt)}</span>
+        <Link href={`/research/${entry.slug}`} className="text-[#00ff88] hover:underline">
+          read entry →
         </Link>
       </div>
     </motion.article>

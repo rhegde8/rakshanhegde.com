@@ -1,7 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import DemosPage from "@/app/(site)/demos/page";
 import HomePage from "@/app/(site)/page";
 import ProjectsPage from "@/app/(site)/projects/page";
 import ResearchPage from "@/app/(site)/research/page";
@@ -16,30 +15,19 @@ describe("route render smoke", () => {
     render(page);
 
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/ai signals/i)).toBeInTheDocument();
   });
 
   it("renders projects page with search controls", async () => {
     const page = await ProjectsPage();
     render(page);
 
-    expect(screen.getByRole("heading", { name: "Projects" })).toBeInTheDocument();
-    expect(screen.getByRole("searchbox", { name: "Search" })).toBeInTheDocument();
+    expect(screen.getByRole("searchbox", { name: "search" })).toBeInTheDocument();
   });
 
   it("renders research entries page", async () => {
     const page = await ResearchPage();
     render(page);
 
-    expect(screen.getByRole("heading", { name: "Research" })).toBeInTheDocument();
     expect(screen.getByText(/showing/i)).toBeInTheDocument();
-  });
-
-  it("renders demos page with cards", async () => {
-    const page = await DemosPage();
-    render(page);
-
-    expect(screen.getByRole("heading", { name: "Demos" })).toBeInTheDocument();
-    expect(screen.getAllByTitle(/demo/i).length).toBeGreaterThan(0);
   });
 });

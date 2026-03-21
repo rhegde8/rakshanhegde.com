@@ -15,7 +15,7 @@ export default async function ProjectsPage(): Promise<React.JSX.Element> {
   return (
     <div className="space-y-6">
       <SectionHeading
-        title="Projects"
+        title="selected projects"
         subtitle="A mix of product delivery, platform engineering, and applied AI systems."
       />
       <ProjectsClientView projects={projects} />

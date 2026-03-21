@@ -18,7 +18,7 @@ export function ContactForm(): React.JSX.Element {
 
   return (
     <form
-      className="surface-panel grid gap-3 p-4"
+      className="grid gap-3 border border-[#1e1e1e] bg-[#111111] p-5"
       onSubmit={async (event) => {
         event.preventDefault();
 
@@ -64,24 +64,24 @@ export function ContactForm(): React.JSX.Element {
       }}
     >
       <div className="grid gap-3 sm:grid-cols-2">
-        <label className="text-muted text-sm">
-          Name
+        <label className="font-mono text-sm text-[#6b7280]">
+          name
           <input
             required
             name="name"
             type="text"
             autoComplete="name"
-            className="border-border bg-bg ring-accent-1/40 mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
+            className="mt-1 w-full border border-[#1e1e1e] bg-[#0c0c0c] px-3 py-2 text-sm text-[#e2e8f0] transition-colors outline-none focus:border-[#00ff88]"
           />
         </label>
-        <label className="text-muted text-sm">
-          Email
+        <label className="font-mono text-sm text-[#6b7280]">
+          email
           <input
             required
             name="email"
             type="email"
             autoComplete="email"
-            className="border-border bg-bg ring-accent-1/40 mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
+            className="mt-1 w-full border border-[#1e1e1e] bg-[#0c0c0c] px-3 py-2 text-sm text-[#e2e8f0] transition-colors outline-none focus:border-[#00ff88]"
           />
         </label>
       </div>
@@ -91,27 +91,31 @@ export function ContactForm(): React.JSX.Element {
         <input name="company" type="text" autoComplete="off" tabIndex={-1} />
       </label>
 
-      <label className="text-muted text-sm">
-        Message
+      <label className="font-mono text-sm text-[#6b7280]">
+        message
         <textarea
           required
           name="message"
           rows={5}
-          className="border-border bg-bg ring-accent-1/40 mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
+          className="mt-1 w-full border border-[#1e1e1e] bg-[#0c0c0c] px-3 py-2 text-sm text-[#e2e8f0] transition-colors outline-none focus:border-[#00ff88]"
         />
       </label>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="bg-accent-1 text-bg w-fit rounded-md px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-fit bg-[#00ff88] px-4 py-2 font-mono text-sm font-semibold text-[#0c0c0c] transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isSubmitting ? "Sending..." : "Send message"}
+        {isSubmitting ? "sending..." : "send message"}
       </button>
 
       {formState.kind !== "idle" ? (
         <p
-          className={formState.kind === "success" ? "text-success text-sm" : "text-danger text-sm"}
+          className={
+            formState.kind === "success"
+              ? "font-mono text-sm text-[#28c840]"
+              : "font-mono text-sm text-[#ff5f57]"
+          }
         >
           {formState.message}
         </p>

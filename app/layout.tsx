@@ -23,7 +23,7 @@ const codeFont = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} | ${siteConfig.role}`,
+    default: `${siteConfig.name} — builds things that actually work.`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: `${siteConfig.name} | ${siteConfig.role}`,
+    title: `${siteConfig.name} — builds things that actually work.`,
     description: siteConfig.description,
     siteName: siteConfig.name,
     url: siteConfig.url,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} | ${siteConfig.role}`,
+    title: `${siteConfig.name} — builds things that actually work.`,
     description: siteConfig.description,
   },
 };

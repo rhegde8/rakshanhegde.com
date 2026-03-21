@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getAllDemos, getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
-import { demoFrontmatterSchema } from "@/lib/schema/demo";
+import { getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
 import { projectFrontmatterSchema } from "@/lib/schema/project";
 import { researchFrontmatterSchema } from "@/lib/schema/research";
 
@@ -34,20 +33,6 @@ describe("content frontmatter schemas", () => {
 
     expect(result.success).toBe(true);
   });
-
-  it("validates demo local video URLs", () => {
-    const result = demoFrontmatterSchema.safeParse({
-      slug: "demo-entry",
-      title: "Demo entry",
-      summary: "A valid summary with enough words for schema constraints.",
-      updatedAt: "2025-12-01",
-      videoType: "local",
-      videoUrl: "relative/path/video.mp4",
-      tags: ["demo"],
-    });
-
-    expect(result.success).toBe(false);
-  });
 });
 
 describe("content loaders", () => {
@@ -65,10 +50,8 @@ describe("content loaders", () => {
     }
   });
 
-  it("loads research and demo entries", async () => {
-    const [researchEntries, demos] = await Promise.all([getAllResearchEntries(), getAllDemos()]);
-
+  it("loads research entries", async () => {
+    const researchEntries = await getAllResearchEntries();
     expect(researchEntries.length).toBeGreaterThan(0);
-    expect(demos.length).toBeGreaterThan(0);
   });
 });
