@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
+    # eslint-plugin-react (via eslint-config-next) is not compatible with ESLint 10 yet.
+    # Grouped "quality-tooling" PRs were rewriting pnpm.overrides.eslint to 10.x (see PR #29).
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     groups:
       frontend-runtime:
         patterns:
