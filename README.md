@@ -300,6 +300,7 @@ On `main`: require PR, require **`quality`** CI success, up-to-date branch, no f
 - **next-mdx-remote:** MDX from repo files without bundling all MDX at edge cases in the main bundle.
 - **zod:** Runtime validation for content and API payloads.
 - **In-repo fuzzy search:** `lib/search/fuzzy.ts` avoids pulling a heavy search dependency.
+- **ESLint 9.x (exact patch in `package.json`):** `eslint-plugin-react` pulled in via `eslint-config-next` does not yet support ESLint 10 (`context.filename` migration). Stay on latest **9.39.x** until that ecosystem catches up.
 
 ---
 
