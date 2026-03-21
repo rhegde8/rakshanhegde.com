@@ -19,16 +19,16 @@ export function ProjectCard({ project }: ProjectCardProps): React.JSX.Element {
 
   return (
     <motion.article
-      {...(!shouldReduceMotion ? { whileHover: { y: -4 } } : {})}
+      {...(!shouldReduceMotion ? { whileHover: { y: -2 } } : {})}
       transition={{ duration: motionDurations.fast, ease: motionEasing }}
-      className="surface-panel flex h-full flex-col gap-4 p-4"
+      className="flex h-full flex-col gap-4 border border-[#1e1e1e] bg-[#111111] p-5"
     >
       <header className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-text text-lg font-semibold">{project.title}</h3>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <h3 className="font-mono text-base font-semibold text-[#e2e8f0]">{project.title}</h3>
           <StatusBadge status={project.status} />
         </div>
-        <p className="text-muted text-sm">{project.summary}</p>
+        <p className="text-sm leading-relaxed text-[#6b7280]">{project.summary}</p>
       </header>
 
       <div className="flex flex-wrap gap-1.5">
@@ -37,20 +37,30 @@ export function ProjectCard({ project }: ProjectCardProps): React.JSX.Element {
         ))}
       </div>
 
-      <div className="text-muted mt-auto flex items-center justify-between gap-3 pt-2 text-xs">
-        <span>Updated {formatDate(project.updatedAt)}</span>
+      <div className="mt-auto flex items-center justify-between gap-3 pt-2 font-mono text-xs text-[#6b7280]">
+        <span>{formatDate(project.updatedAt)}</span>
         <div className="flex items-center gap-3">
-          <Link href={`/projects/${project.slug}`} className="text-accent-1 hover:underline">
-            Details
+          <Link href={`/projects/${project.slug}`} className="text-[#00ff88] hover:underline">
+            details →
           </Link>
           {project.liveUrl ? (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="hover:underline">
-              Live
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-[#e2e8f0]"
+            >
+              live
             </a>
           ) : null}
           {project.repoUrl ? (
-            <a href={project.repoUrl} target="_blank" rel="noreferrer" className="hover:underline">
-              Repo
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-[#e2e8f0]"
+            >
+              repo
             </a>
           ) : null}
         </div>

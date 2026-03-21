@@ -52,8 +52,8 @@ export function ResearchClientView({ entries }: ResearchClientViewProps): React.
         ]}
       />
 
-      <p className="text-muted mb-4 text-sm">
-        Showing {filteredEntries.length} of {entries.length} entries.
+      <p className="mb-4 font-mono text-xs text-[#6b7280]">
+        showing {filteredEntries.length} of {entries.length} entries.
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">

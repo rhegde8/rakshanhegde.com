@@ -52,35 +52,47 @@ export default async function ProjectDetailPage({
 
   return (
     <article className="space-y-6">
-      <Link href="/projects" className="text-accent-1 text-sm hover:underline">
-        ← Back to projects
+      <Link href="/projects" className="font-mono text-xs text-[#00ff88] hover:underline">
+        ← back to projects
       </Link>
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">{project.title}</h1>
+          <h1 className="font-mono text-3xl font-semibold tracking-tight text-[#e2e8f0]">
+            {project.title}
+          </h1>
           <StatusBadge status={project.status} />
         </div>
-        <p className="text-muted max-w-3xl text-sm sm:text-base">{project.summary}</p>
-        <div className="text-muted flex flex-wrap items-center gap-2 text-xs">
-          <span>Started {formatDate(project.startedAt)}</span>
-          <span>•</span>
-          <span>Updated {formatDate(project.updatedAt)}</span>
+        <p className="max-w-3xl text-sm text-[#6b7280] sm:text-base">{project.summary}</p>
+        <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[#6b7280]">
+          <span>started {formatDate(project.startedAt)}</span>
+          <span>·</span>
+          <span>updated {formatDate(project.updatedAt)}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {project.stack.map((skill) => (
             <TagPill key={skill} label={skill} />
           ))}
         </div>
-        <div className="text-muted flex flex-wrap gap-3 text-sm">
+        <div className="flex flex-wrap gap-3 font-mono text-sm text-[#6b7280]">
           {project.repoUrl ? (
-            <a href={project.repoUrl} target="_blank" rel="noreferrer" className="hover:underline">
-              Repository
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-[#00ff88]"
+            >
+              repository
             </a>
           ) : null}
           {project.liveUrl ? (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="hover:underline">
-              Live
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-[#00ff88]"
+            >
+              live
             </a>
           ) : null}
           {project.caseStudyUrl ? (
@@ -88,9 +100,9 @@ export default async function ProjectDetailPage({
               href={project.caseStudyUrl}
               target="_blank"
               rel="noreferrer"
-              className="hover:underline"
+              className="transition-colors hover:text-[#00ff88]"
             >
-              Case Study
+              case study
             </a>
           ) : null}
         </div>

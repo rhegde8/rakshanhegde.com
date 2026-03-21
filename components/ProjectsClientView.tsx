@@ -80,8 +80,8 @@ export function ProjectsClientView({ projects }: ProjectsClientViewProps): React
         ]}
       />
 
-      <p className="text-muted mb-4 text-sm">
-        Showing {filteredProjects.length} of {projects.length} projects.
+      <p className="mb-4 font-mono text-xs text-[#6b7280]">
+        showing {filteredProjects.length} of {projects.length} projects.
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">

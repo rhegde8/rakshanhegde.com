@@ -23,13 +23,13 @@ export function TerminalPanel({ lines, className }: TerminalPanelProps): React.J
 
     let currentIndex = 0;
     const interval = window.setInterval(() => {
-      currentIndex = Math.min(fullText.length, currentIndex + 2);
+      currentIndex = Math.min(fullText.length, currentIndex + 3);
       setTypedText(fullText.slice(0, currentIndex));
 
       if (currentIndex >= fullText.length) {
         window.clearInterval(interval);
       }
-    }, 24);
+    }, 18);
 
     return () => {
       window.clearInterval(interval);
@@ -43,24 +43,28 @@ export function TerminalPanel({ lines, className }: TerminalPanelProps): React.J
   return (
     <section
       aria-label="Terminal introduction"
-      className={cn(
-        "surface-panel terminal-grid-bg border-border/90 overflow-hidden rounded-xl border",
-        className,
-      )}
+      className={cn("w-full overflow-hidden border border-[#1e1e1e] bg-[#0f0f0f]", className)}
     >
-      <div className="border-border/70 flex items-center gap-2 border-b px-4 py-2.5">
-        <span className="bg-danger h-2.5 w-2.5 rounded-full" />
-        <span className="bg-warning h-2.5 w-2.5 rounded-full" />
-        <span className="bg-success h-2.5 w-2.5 rounded-full" />
-        <span className="text-muted ml-2 font-mono text-xs">terminal://rakshan-intro</span>
+      <div className="flex items-center gap-2 border-b border-[#1e1e1e] px-4 py-2.5">
+        <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+        <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
+        <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+        <span className="ml-3 font-mono text-xs text-[#6b7280]">rakshan@dev — zsh</span>
       </div>
-      <pre className="text-muted overflow-x-auto px-4 py-4 font-mono text-xs leading-relaxed sm:text-sm">
-        {typedLines.map((line, index) => (
-          <div key={`${line}-${index}`}>{line || "\u00A0"}</div>
-        ))}
+      <pre className="overflow-x-auto px-5 py-5 font-mono text-xs leading-relaxed text-[#6b7280] sm:text-sm">
+        {typedLines.map((line, index) => {
+          const isCommand = line.startsWith("$");
+          return (
+            <div key={`${line}-${index}`} className={isCommand ? "text-[#e2e8f0]" : ""}>
+              {line || "\u00A0"}
+            </div>
+          );
+        })}
         {!isComplete ? (
-          <span className="text-accent-1 ml-1 inline-block animate-pulse">█</span>
-        ) : null}
+          <span className="cursor-blink inline-block text-[#00ff88]">█</span>
+        ) : (
+          <span className="cursor-blink inline-block text-[#00ff88]">█</span>
+        )}
       </pre>
     </section>
   );
