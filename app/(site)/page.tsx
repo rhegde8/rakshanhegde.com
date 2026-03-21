@@ -33,7 +33,8 @@ export default async function HomePage(): Promise<React.JSX.Element> {
           <div className="flex flex-wrap gap-3 pt-2">
             <Link
               href="/projects"
-              className="bg-[#00ff88] px-4 py-2 font-mono text-sm font-semibold text-[#0c0c0c] transition-opacity hover:opacity-85"
+              className="px-4 py-2 font-mono text-sm font-normal text-[#00ff88] transition-colors hover:bg-[#00ff8810]"
+              style={{ border: "0.5px solid #00ff88" }}
             >
               view projects
             </Link>
