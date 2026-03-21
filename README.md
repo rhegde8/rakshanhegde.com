@@ -36,7 +36,7 @@ Other files under `docs/` are **narrow runbooks** (deploy steps, checklists). Th
 | Tests                | Vitest + Testing Library; Playwright e2e smoke                           |
 | Git hooks            | Husky (`prepare` in `package.json`)                                      |
 
-Node: **≥ 20.10** (`package.json` `engines`). Package manager: **pnpm** (see CI).
+Node: **20.x** (`package.json` `engines`; matches Vercel major). Package manager: **pnpm** (see CI).
 
 ---
 
@@ -183,7 +183,7 @@ flowchart LR
 
 ## Local setup
 
-1. **Node** ≥ 20.10 and **pnpm** (repo assumes pnpm; CI uses pnpm 10).
+1. **Node** 20.x and **pnpm** (repo assumes pnpm; CI uses Node 20).
 2. `pnpm install` (runs Husky `prepare`).
 3. `cp .env.example .env.local` and set variables as needed.
 4. `pnpm dev` → [http://localhost:3000](http://localhost:3000).
