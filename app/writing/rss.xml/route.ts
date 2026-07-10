@@ -1,5 +1,5 @@
-import { getAllResearchEntries } from "@/lib/content/loaders";
 import { siteConfig } from "@/lib/config/site";
+import { getAllWritingEntries } from "@/lib/content/loaders";
 
 function escapeXml(value: string): string {
   return value
@@ -11,15 +11,15 @@ function escapeXml(value: string): string {
 }
 
 export async function GET(): Promise<Response> {
-  const entries = await getAllResearchEntries();
+  const entries = await getAllWritingEntries();
 
   const items = entries
     .map(
       (entry) => `
       <item>
         <title>${escapeXml(entry.title)}</title>
-        <link>${siteConfig.url}/research/${entry.slug}</link>
-        <guid>${siteConfig.url}/research/${entry.slug}</guid>
+        <link>${siteConfig.url}/writing/${entry.slug}</link>
+        <guid>${siteConfig.url}/writing/${entry.slug}</guid>
         <pubDate>${new Date(entry.updatedAt).toUTCString()}</pubDate>
         <description>${escapeXml(entry.summary)}</description>
       </item>`,
@@ -29,8 +29,8 @@ export async function GET(): Promise<Response> {
   const body = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
-    <title>${escapeXml(siteConfig.name)} - Research</title>
-    <link>${siteConfig.url}/research</link>
+    <title>${escapeXml(siteConfig.name)} - Writing</title>
+    <link>${siteConfig.url}/writing</link>
     <description>${escapeXml(siteConfig.description)}</description>
     <language>en</language>
     ${items}

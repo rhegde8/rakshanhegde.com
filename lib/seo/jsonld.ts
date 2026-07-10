@@ -1,5 +1,5 @@
 import { siteConfig } from "@/lib/config/site";
-import type { ProjectEntry, ResearchEntry } from "@/lib/content/types";
+import type { ProjectEntry, WritingEntry } from "@/lib/content/types";
 
 type JsonLdObject = Record<string, unknown>;
 
@@ -33,7 +33,7 @@ export function buildWebsiteJsonLd(): JsonLdObject {
   };
 }
 
-export function buildResearchArticleJsonLd(entry: ResearchEntry): JsonLdObject {
+export function buildArticleJsonLd(entry: WritingEntry): JsonLdObject {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -45,7 +45,7 @@ export function buildResearchArticleJsonLd(entry: ResearchEntry): JsonLdObject {
       name: siteConfig.name,
     },
     keywords: entry.tags.join(", "),
-    url: absoluteUrl(`/research/${entry.slug}`),
+    url: absoluteUrl(`/writing/${entry.slug}`),
   };
 }
 

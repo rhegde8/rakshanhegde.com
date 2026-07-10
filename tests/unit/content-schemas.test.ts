@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
+import { getAllProjects, getAllWritingEntries } from "@/lib/content/loaders";
 import { projectFrontmatterSchema } from "@/lib/schema/project";
-import { researchFrontmatterSchema } from "@/lib/schema/research";
+import { writingFrontmatterSchema } from "@/lib/schema/writing";
 
 describe("content frontmatter schemas", () => {
   it("validates project status and completion rules", () => {
@@ -21,11 +21,11 @@ describe("content frontmatter schemas", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts research metadata with optional fields", () => {
-    const result = researchFrontmatterSchema.safeParse({
-      slug: "research-entry",
-      title: "Research entry",
-      summary: "A valid research frontmatter payload for schema checks.",
+  it("accepts writing metadata with optional fields", () => {
+    const result = writingFrontmatterSchema.safeParse({
+      slug: "writing-entry",
+      title: "Writing entry",
+      summary: "A valid writing frontmatter payload for schema checks.",
       updatedAt: "2025-10-01",
       tags: ["rag", "evals"],
       featured: true,
@@ -50,8 +50,8 @@ describe("content loaders", () => {
     }
   });
 
-  it("loads research entries", async () => {
-    const researchEntries = await getAllResearchEntries();
-    expect(researchEntries.length).toBeGreaterThan(0);
+  it("loads writing entries", async () => {
+    const writingEntries = await getAllWritingEntries();
+    expect(writingEntries.length).toBeGreaterThan(0);
   });
 });

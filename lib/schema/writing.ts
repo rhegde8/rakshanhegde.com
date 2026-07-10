@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { isoDateFromYamlSchema, slugSchema, uniqueLowercaseList } from "@/lib/schema/shared";
 
-export const researchFrontmatterSchema = z
+export const writingFrontmatterSchema = z
   .object({
     slug: slugSchema,
     title: z.string().trim().min(2),
@@ -16,4 +16,4 @@ export const researchFrontmatterSchema = z
   })
   .strict();
 
-export type ResearchFrontmatter = z.infer<typeof researchFrontmatterSchema>;
+export type WritingFrontmatter = z.infer<typeof writingFrontmatterSchema>;
