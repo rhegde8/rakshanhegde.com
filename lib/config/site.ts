@@ -14,12 +14,7 @@ export const siteConfig = {
     "$ focus --now",
     "eval-driven AI · production reliability · agent systems that actually hold up",
     "",
-    "$ git log --oneline -5",
-    "a3f9c12 evalops-control-plane: add drift detection + alert routing",
-    "b7e2d04 agent-observability-platform: trace correlation across tool calls",
-    "c1a8f3e rag-knowledge-orchestrator: hybrid retrieval with reranking",
-    "d4b5e91 local-inference-workbench: quantization benchmark harness",
-    "e9c7a2f security-audit-pipeline: automated vuln triage with LLM assist",
+    "type `help` to explore",
   ],
   navItems: [
     { label: "home", href: "/" },

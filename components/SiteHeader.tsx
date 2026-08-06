@@ -20,6 +20,13 @@ export function SiteHeader(): React.JSX.Element {
               {item.label}
             </Link>
           ))}
+          <kbd
+            aria-hidden="true"
+            title="Open command palette"
+            className="ml-1 hidden border border-[#1e1e1e] px-1.5 py-0.5 font-mono text-[10px] text-[#6b7280] sm:inline-block"
+          >
+            ⌘K
+          </kbd>
         </nav>
       </div>
     </header>
