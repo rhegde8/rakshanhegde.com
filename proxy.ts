@@ -44,7 +44,7 @@ function unauthorized(): NextResponse {
  * Content pages that have a markdown representation via /api/markdown.
  * `/` and the two collection roots, plus their detail slugs.
  */
-const MARKDOWN_PATH = /^\/(?:(?:projects|research)(?:\/[a-z0-9-]+)?)?$/;
+const MARKDOWN_PATH = /^\/(?:(?:projects|writing)(?:\/[a-z0-9-]+)?)?$/;
 
 function rewriteToMarkdown(request: NextRequest, targetPath: string): NextResponse {
   const rewriteUrl = new URL("/api/markdown", request.url);

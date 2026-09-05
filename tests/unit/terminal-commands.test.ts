@@ -12,7 +12,7 @@ const data: TerminalData = {
       status: "ongoing",
     },
   ],
-  research: [
+  writing: [
     {
       slug: "rag-eval-metrics",
       title: "Practical RAG Evaluation Metrics",

@@ -1,25 +1,21 @@
 import { describe, expect, it } from "vitest";
 
-import { getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
-import {
-  projectToMarkdown,
-  researchToMarkdown,
-  siteOverviewMarkdown,
-} from "@/lib/content/markdown";
+import { getAllProjects, getAllWritingEntries } from "@/lib/content/loaders";
+import { projectToMarkdown, writingToMarkdown, siteOverviewMarkdown } from "@/lib/content/markdown";
 
 describe("agent-facing markdown surface", () => {
   it("builds a site overview linking every entry as markdown", async () => {
-    const [overview, projects, research] = await Promise.all([
+    const [overview, projects, writing] = await Promise.all([
       siteOverviewMarkdown(),
       getAllProjects(),
-      getAllResearchEntries(),
+      getAllWritingEntries(),
     ]);
 
     for (const project of projects) {
       expect(overview).toContain(`/projects/${project.slug}.md`);
     }
-    for (const entry of research) {
-      expect(overview).toContain(`/research/${entry.slug}.md`);
+    for (const entry of writing) {
+      expect(overview).toContain(`/writing/${entry.slug}.md`);
     }
     expect(overview).toContain("Accept: text/markdown");
   });
@@ -34,11 +30,11 @@ describe("agent-facing markdown surface", () => {
     expect(markdown).toContain(project!.content.slice(0, 40));
   });
 
-  it("serializes a research entry with metadata and body", async () => {
-    const [entry] = await getAllResearchEntries();
+  it("serializes a writing entry with metadata and body", async () => {
+    const [entry] = await getAllWritingEntries();
     expect(entry).toBeDefined();
 
-    const markdown = researchToMarkdown(entry!);
+    const markdown = writingToMarkdown(entry!);
     expect(markdown).toContain(`# ${entry!.title}`);
     expect(markdown).toContain(`- Updated: ${entry!.updatedAt}`);
   });

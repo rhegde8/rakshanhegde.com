@@ -16,7 +16,7 @@ export type TerminalEntrySummary = {
 
 export type TerminalData = {
   projects: readonly TerminalEntrySummary[];
-  research: readonly TerminalEntrySummary[];
+  writing: readonly TerminalEntrySummary[];
 };
 
 export type CommandResult = {
@@ -32,7 +32,7 @@ const error = (text: string): TerminalLine => ({ text, kind: "error" });
 const PAGES: Record<string, string> = {
   home: "/",
   projects: "/projects",
-  research: "/research",
+  writing: "/writing",
   about: "/about",
 };
 
@@ -41,8 +41,8 @@ const HELP_LINES: TerminalLine[] = [
   out("  help              show this list"),
   out("  whoami            who runs this place"),
   out("  focus             what I'm working on now"),
-  out("  ls [collection]   list projects or research"),
-  out("  cat <slug>        summary of a project or research note"),
+  out("  ls [collection]   list projects or writing"),
+  out("  cat <slug>        summary of a project or writing entry"),
   out("  open <target>     go to a page or entry (e.g. open about)"),
   out("  contact           email and links"),
   out("  clear             clear the screen"),
@@ -73,9 +73,9 @@ function findEntry(
   if (project) {
     return { entry: project, path: `/projects/${project.slug}` };
   }
-  const research = data.research.find((candidate) => candidate.slug === slug);
-  if (research) {
-    return { entry: research, path: `/research/${research.slug}` };
+  const writing = data.writing.find((candidate) => candidate.slug === slug);
+  if (writing) {
+    return { entry: writing, path: `/writing/${writing.slug}` };
   }
   return null;
 }
@@ -92,7 +92,7 @@ export function allCompletionTargets(data: TerminalData): string[] {
     "clear",
     ...Object.keys(PAGES),
     ...data.projects.map((entry) => entry.slug),
-    ...data.research.map((entry) => entry.slug),
+    ...data.writing.map((entry) => entry.slug),
   ];
 }
 
@@ -109,7 +109,7 @@ export function completeInput(input: string, data: TerminalData): string[] {
   const commands = ["help", "whoami", "focus", "ls", "cat", "open", "contact", "clear"];
   const slugs = [
     ...data.projects.map((entry) => entry.slug),
-    ...data.research.map((entry) => entry.slug),
+    ...data.writing.map((entry) => entry.slug),
   ];
   const pool = isFirstWord ? commands : [...Object.keys(PAGES), ...slugs];
 
@@ -147,7 +147,7 @@ export function runCommand(rawInput: string, data: TerminalData): CommandResult 
           lines: [
             ...listEntries("projects", data.projects),
             out(""),
-            ...listEntries("research", data.research),
+            ...listEntries("writing", data.writing),
           ],
         };
       }
@@ -155,8 +155,8 @@ export function runCommand(rawInput: string, data: TerminalData): CommandResult 
       if (target === "projects") {
         return { lines: listEntries("projects", data.projects) };
       }
-      if (target === "research") {
-        return { lines: listEntries("research", data.research) };
+      if (target === "writing") {
+        return { lines: listEntries("writing", data.writing) };
       }
       return { lines: [error(`ls: no such collection: ${argument}`)] };
     }

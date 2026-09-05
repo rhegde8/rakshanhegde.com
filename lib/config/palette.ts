@@ -1,9 +1,9 @@
 import type { PaletteItem } from "@/components/CommandPalette";
 import { siteConfig } from "@/lib/config/site";
-import { getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
+import { getAllProjects, getAllWritingEntries } from "@/lib/content/loaders";
 
 export async function buildPaletteItems(): Promise<PaletteItem[]> {
-  const [projects, research] = await Promise.all([getAllProjects(), getAllResearchEntries()]);
+  const [projects, writing] = await Promise.all([getAllProjects(), getAllWritingEntries()]);
 
   const pages: PaletteItem[] = siteConfig.navItems.map((item) => ({
     id: `page:${item.href}`,
@@ -21,11 +21,11 @@ export async function buildPaletteItems(): Promise<PaletteItem[]> {
     keywords: [...project.tags, ...project.stack, project.slug],
   }));
 
-  const researchItems: PaletteItem[] = research.map((entry) => ({
-    id: `research:${entry.slug}`,
+  const writingItems: PaletteItem[] = writing.map((entry) => ({
+    id: `writing:${entry.slug}`,
     label: entry.title,
-    hint: "research",
-    href: `/research/${entry.slug}`,
+    hint: "writing",
+    href: `/writing/${entry.slug}`,
     keywords: [...entry.tags, entry.slug],
   }));
 
@@ -54,11 +54,11 @@ export async function buildPaletteItems(): Promise<PaletteItem[]> {
     {
       id: "action:rss",
       label: "rss feed",
-      hint: "research",
-      href: "/research/rss.xml",
+      hint: "writing",
+      href: "/writing/rss.xml",
       keywords: ["feed", "subscribe"],
     },
   ];
 
-  return [...pages, ...projectItems, ...researchItems, ...actions];
+  return [...pages, ...projectItems, ...writingItems, ...actions];
 }
