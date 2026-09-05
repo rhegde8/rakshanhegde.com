@@ -99,7 +99,7 @@ flowchart TD
 
 1. **`proxy.ts`** — If `SITE_PASSWORD` is set, require HTTP Basic Auth; otherwise `NextResponse.next()`. Matcher skips `/_next/*` and `/favicon.ico`. After auth, content-page requests ending in `.md` (or sent with `Accept: text/markdown`) are rewritten to `/api/markdown` (see **Agent-native surface**).
 2. **`next.config.ts` `headers()`** — Global security headers + CSP from `lib/security/headers.ts` (applies broadly via `source: "/(.*)"`).
-3. **App Router** — Matched `app/**` segment renders (mostly Server Components) or invokes Route Handlers under `app/api/*` and `app/research/rss.xml/route.ts`.
+3. **App Router** — Matched `app/**` segment renders (mostly Server Components) or invokes Route Handlers under `app/api/*` and `app/writing/rss.xml/route.ts`.
 
 ---
 
@@ -114,14 +114,12 @@ Use this table when routing a task to the right file.
 | **Chrome layout**     | `app/(site)/layout.tsx`                    | `SiteHeader`, `<main>`, `SiteFooter` — route group `(site)` does **not** appear in URLs           |
 | **Site config**       | `lib/config/site.ts`                       | Name, nav, social links, email, `siteConfig.url` (from `NEXT_PUBLIC_SITE_URL` or fallback)        |
 | **Next config**       | `next.config.ts`                           | Security headers attachment                                                                       |
-| **Content load**      | `lib/content/loaders.ts`                   | Read `content/{projects,research}/*.mdx`, parse frontmatter, zod validate, sort by `updatedAt`    |
+| **Content load**      | `lib/content/loaders.ts`                   | Read `content/{projects,writing}/*.mdx`, parse frontmatter, zod validate, sort by `updatedAt`     |
+| **Lab experiments**   | `lib/lab/*.ts`, `components/lab/*`         | Client-only AI games: BREACH (prompt-injection) + DESCENT (gradient descent), plus the registry   |
 | **Schemas**           | `lib/schema/*.ts`                          | Frontmatter + contact payload shapes                                                              |
 | **SEO helpers**       | `lib/seo/metadata.ts`, `lib/seo/jsonld.ts` | Page metadata and JSON-LD builders                                                                |
 | **Contact API**       | `app/api/contact/route.ts`                 | POST handler; gated by `ENABLE_CONTACT_FORM`; zod + rate limit                                    |
-| **Markdown API**      | `app/api/markdown/route.ts`                | Markdown versions of content pages (reached via proxy rewrite, not linked directly)               |
-| **llms.txt**          | `app/llms.txt/route.ts`                    | Agent-facing site overview generated from content                                                 |
-| **OG images**         | `app/opengraph-image.tsx` + per-slug files | Generated phosphor-terminal social cards via `lib/og/template.tsx` (`next/og`)                    |
-| **RSS**               | `app/research/rss.xml/route.ts`            | GET → RSS XML for research entries                                                                |
+| **RSS**               | `app/writing/rss.xml/route.ts`             | GET → RSS XML for writing entries                                                                 |
 | **Sitemap**           | `app/sitemap.ts`                           | Metadata route for sitemap                                                                        |
 | **Robots**            | `app/robots.ts`                            | Metadata route for robots.txt                                                                     |
 | **404**               | `app/not-found.tsx`                        | Global not-found UI                                                                               |
@@ -131,13 +129,18 @@ Use this table when routing a task to the right file.
 | URL                | File                              |
 | ------------------ | --------------------------------- |
 | `/`                | `(site)/page.tsx`                 |
+| `/lab`             | `(site)/lab/page.tsx`             |
+| `/lab/breach`      | `(site)/lab/breach/page.tsx`      |
+| `/lab/descent`     | `(site)/lab/descent/page.tsx`     |
 | `/projects`        | `(site)/projects/page.tsx`        |
 | `/projects/[slug]` | `(site)/projects/[slug]/page.tsx` |
-| `/research`        | `(site)/research/page.tsx`        |
-| `/research/[slug]` | `(site)/research/[slug]/page.tsx` |
+| `/writing`         | `(site)/writing/page.tsx`         |
+| `/writing/[slug]`  | `(site)/writing/[slug]/page.tsx`  |
 | `/about`           | `(site)/about/page.tsx`           |
 | `/privacy`         | `(site)/privacy/page.tsx`         |
 | `/terms`           | `(site)/terms/page.tsx`           |
+
+Legacy `/research` and `/research/[slug]` URLs **301-redirect** to their `/writing` equivalents (`next.config.ts`).
 
 Detail routes use **`generateStaticParams`** where applicable so slugs are known at build time.
 
@@ -150,9 +153,7 @@ Detail routes use **`generateStaticParams`** where applicable so slugs are known
 | **HTML (RSC)**                      | App Router pages → streamed/flight response to browser                   |
 | **401 + `WWW-Authenticate: Basic`** | `proxy.ts` when auth missing or invalid                                  |
 | **JSON**                            | `POST /api/contact` — success/error body from `app/api/contact/route.ts` |
-| **Markdown**                        | `GET /llms.txt`, `GET <content-path>.md`, `Accept: text/markdown`        |
-| **PNG (OG images)**                 | `GET /opengraph-image`, per-slug `opengraph-image` routes                |
-| **XML (RSS)**                       | `GET /research/rss.xml`                                                  |
+| **XML (RSS)**                       | `GET /writing/rss.xml`                                                   |
 | **Metadata routes**                 | `GET` sitemap / robots via `app/sitemap.ts`, `app/robots.ts`             |
 | **Static assets**                   | `public/`, `_next/static` (bypassed by proxy matcher)                    |
 
@@ -250,7 +251,7 @@ Secrets stay in **`.env.local`** (local) and **Vercel project settings** (produc
 MDX lives in:
 
 - `content/projects/*.mdx`
-- `content/research/*.mdx`
+- `content/writing/*.mdx`
 
 Pipeline: **read file** → **gray-matter** → **zod parse** (`lib/schema/*`) → **sort** by `updatedAt` desc → **detail pages** compile MDX via `next-mdx-remote`.
 
@@ -311,10 +312,9 @@ Both are implemented as a proxy rewrite (`proxy.ts`, after Basic Auth) to `app/a
 
 ## SEO & discovery
 
-- Per-page metadata helpers and JSON-LD (`Article` for research; `SoftwareSourceCode` for projects).
-- Generated OG images (phosphor terminal style) for the root and every project/research detail page via `next/og` — template in `lib/og/template.tsx`, fonts in `assets/fonts/`.
+- Per-page metadata helpers and JSON-LD (`Article` for writing; `SoftwareSourceCode` for projects).
 - `app/robots.ts`, `app/sitemap.ts`.
-- RSS: `/research/rss.xml`.
+- RSS: `/writing/rss.xml`.
 
 ---
 

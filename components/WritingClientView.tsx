@@ -2,16 +2,16 @@
 
 import { useMemo, useState } from "react";
 
-import { ResearchCard } from "@/components/ResearchCard";
 import { SearchAndFilterBar } from "@/components/SearchAndFilterBar";
-import type { ResearchEntry } from "@/lib/content/types";
+import { WritingCard } from "@/components/WritingCard";
+import type { WritingEntry } from "@/lib/content/types";
 import { filterByFuzzySearch } from "@/lib/search/fuzzy";
 
-type ResearchClientViewProps = {
-  entries: ResearchEntry[];
+type WritingClientViewProps = {
+  entries: WritingEntry[];
 };
 
-export function ResearchClientView({ entries }: ResearchClientViewProps): React.JSX.Element {
+export function WritingClientView({ entries }: WritingClientViewProps): React.JSX.Element {
   const [searchValue, setSearchValue] = useState("");
   const [tagFilter, setTagFilter] = useState("all");
 
@@ -40,7 +40,7 @@ export function ResearchClientView({ entries }: ResearchClientViewProps): React.
       <SearchAndFilterBar
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-        searchPlaceholder="Search research by title, tags, hypothesis, or findings"
+        searchPlaceholder="Search essays by title, tags, or summary"
         filters={[
           {
             id: "tag",
@@ -52,13 +52,13 @@ export function ResearchClientView({ entries }: ResearchClientViewProps): React.
         ]}
       />
 
-      <p className="mb-4 font-mono text-xs text-[#6b7280]">
+      <p className="text-muted mb-4 font-mono text-xs">
         showing {filteredEntries.length} of {entries.length} entries.
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {filteredEntries.map((entry) => (
-          <ResearchCard key={entry.slug} entry={entry} />
+          <WritingCard key={entry.slug} entry={entry} />
         ))}
       </div>
     </section>

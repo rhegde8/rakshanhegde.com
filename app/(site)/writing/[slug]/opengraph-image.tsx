@@ -1,15 +1,15 @@
 import type { ImageResponse } from "next/og";
 import { notFound } from "next/navigation";
 
-import { getAllResearchEntries, getResearchBySlug } from "@/lib/content/loaders";
+import { getAllWritingEntries, getWritingBySlug } from "@/lib/content/loaders";
 import { OG_SIZE, renderOgImage } from "@/lib/og/template";
 
-export const alt = "Research note details";
+export const alt = "Writing entry details";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  const entries = await getAllResearchEntries();
+  const entries = await getAllWritingEntries();
   return entries.map((entry) => ({ slug: entry.slug }));
 }
 
@@ -19,16 +19,16 @@ export default async function OpengraphImage({
   params: Promise<{ slug: string }>;
 }): Promise<ImageResponse> {
   const { slug } = await params;
-  const entry = await getResearchBySlug(slug);
+  const entry = await getWritingBySlug(slug);
 
   if (!entry) {
     notFound();
   }
 
   return renderOgImage({
-    label: "research",
+    label: "writing",
     title: entry.title,
     subtitle: entry.summary,
-    command: `open research/${entry.slug}`,
+    command: `open writing/${entry.slug}`,
   });
 }

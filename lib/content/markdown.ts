@@ -1,6 +1,6 @@
 import { siteConfig } from "@/lib/config/site";
-import { getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
-import type { ProjectEntry, ResearchEntry } from "@/lib/content/types";
+import { getAllProjects, getAllWritingEntries } from "@/lib/content/loaders";
+import type { ProjectEntry, WritingEntry } from "@/lib/content/types";
 
 function absoluteUrl(path: string): string {
   return new URL(path, siteConfig.url).toString();
@@ -21,13 +21,13 @@ export function projectToMarkdown(project: ProjectEntry): string {
   return `# ${project.title}\n\n> ${project.summary}\n\n${meta}\n\n${project.content}\n`;
 }
 
-export function researchToMarkdown(entry: ResearchEntry): string {
+export function writingToMarkdown(entry: WritingEntry): string {
   const meta = [
     `- Updated: ${entry.updatedAt}`,
     `- Tags: ${entry.tags.join(", ")}`,
     ...(entry.hypothesis ? [`- Hypothesis: ${entry.hypothesis}`] : []),
     ...(entry.findings ? [`- Findings: ${entry.findings}`] : []),
-    `- Canonical: ${absoluteUrl(`/research/${entry.slug}`)}`,
+    `- Canonical: ${absoluteUrl(`/writing/${entry.slug}`)}`,
   ].join("\n");
 
   return `# ${entry.title}\n\n> ${entry.summary}\n\n${meta}\n\n${entry.content}\n`;
@@ -44,19 +44,19 @@ export async function projectsIndexMarkdown(): Promise<string> {
   return `# Projects — ${siteConfig.name}\n\n${items}\n`;
 }
 
-export async function researchIndexMarkdown(): Promise<string> {
-  const entries = await getAllResearchEntries();
+export async function writingIndexMarkdown(): Promise<string> {
+  const entries = await getAllWritingEntries();
   const items = entries
     .map(
       (entry) =>
-        `## [${entry.title}](${absoluteUrl(`/research/${entry.slug}.md`)})\n\n${entry.summary}`,
+        `## [${entry.title}](${absoluteUrl(`/writing/${entry.slug}.md`)})\n\n${entry.summary}`,
     )
     .join("\n\n");
-  return `# Research — ${siteConfig.name}\n\n${items}\n`;
+  return `# Writing — ${siteConfig.name}\n\n${items}\n`;
 }
 
 export async function siteOverviewMarkdown(): Promise<string> {
-  const [projects, research] = await Promise.all([getAllProjects(), getAllResearchEntries()]);
+  const [projects, writing] = await Promise.all([getAllProjects(), getAllWritingEntries()]);
 
   const projectLines = projects
     .map(
@@ -64,10 +64,10 @@ export async function siteOverviewMarkdown(): Promise<string> {
         `- [${project.title}](${absoluteUrl(`/projects/${project.slug}.md`)}): ${project.summary}`,
     )
     .join("\n");
-  const researchLines = research
+  const writingLines = writing
     .map(
       (entry) =>
-        `- [${entry.title}](${absoluteUrl(`/research/${entry.slug}.md`)}): ${entry.summary}`,
+        `- [${entry.title}](${absoluteUrl(`/writing/${entry.slug}.md`)}): ${entry.summary}`,
     )
     .join("\n");
 
@@ -88,11 +88,11 @@ export async function siteOverviewMarkdown(): Promise<string> {
     "",
     projectLines,
     "",
-    "## Research",
+    "## Writing",
     "",
-    researchLines,
+    writingLines,
     "",
-    `RSS feed for research: ${absoluteUrl("/research/rss.xml")}`,
+    `RSS feed for writing: ${absoluteUrl("/writing/rss.xml")}`,
     "",
   ].join("\n");
 }

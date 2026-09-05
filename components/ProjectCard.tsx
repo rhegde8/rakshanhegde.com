@@ -21,14 +21,14 @@ export function ProjectCard({ project }: ProjectCardProps): React.JSX.Element {
     <motion.article
       {...(!shouldReduceMotion ? { whileHover: { y: -2 } } : {})}
       transition={{ duration: motionDurations.fast, ease: motionEasing }}
-      className="flex h-full flex-col gap-4 border border-[#1e1e1e] bg-[#111111] p-5"
+      className="surface-panel hover:bg-panel-2 flex h-full flex-col gap-4 p-5 transition-colors"
     >
       <header className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <h3 className="font-mono text-base font-semibold text-[#e2e8f0]">{project.title}</h3>
+          <h3 className="text-text font-mono text-base font-semibold">{project.title}</h3>
           <StatusBadge status={project.status} />
         </div>
-        <p className="text-sm leading-relaxed text-[#6b7280]">{project.summary}</p>
+        <p className="text-muted text-sm leading-relaxed">{project.summary}</p>
       </header>
 
       <div className="flex flex-wrap gap-1.5">
@@ -37,10 +37,10 @@ export function ProjectCard({ project }: ProjectCardProps): React.JSX.Element {
         ))}
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-3 pt-2 font-mono text-xs text-[#6b7280]">
+      <div className="text-muted mt-auto flex items-center justify-between gap-3 pt-2 font-mono text-xs">
         <span>{formatDate(project.updatedAt)}</span>
         <div className="flex items-center gap-3">
-          <Link href={`/projects/${project.slug}`} className="text-[#00ff88] hover:underline">
+          <Link href={`/projects/${project.slug}`} className="text-accent hover:underline">
             details →
           </Link>
           {project.liveUrl ? (
@@ -48,7 +48,7 @@ export function ProjectCard({ project }: ProjectCardProps): React.JSX.Element {
               href={project.liveUrl}
               target="_blank"
               rel="noreferrer"
-              className="transition-colors hover:text-[#e2e8f0]"
+              className="hover:text-text transition-colors"
             >
               live
             </a>
@@ -58,7 +58,7 @@ export function ProjectCard({ project }: ProjectCardProps): React.JSX.Element {
               href={project.repoUrl}
               target="_blank"
               rel="noreferrer"
-              className="transition-colors hover:text-[#e2e8f0]"
+              className="hover:text-text transition-colors"
             >
               repo
             </a>

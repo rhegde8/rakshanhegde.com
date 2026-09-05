@@ -4,9 +4,9 @@ import path from "node:path";
 import matter from "gray-matter";
 import type { z } from "zod";
 
-import type { ContentCollection, ProjectEntry, ResearchEntry } from "@/lib/content/types";
+import type { ContentCollection, ProjectEntry, WritingEntry } from "@/lib/content/types";
 import { projectFrontmatterSchema } from "@/lib/schema/project";
-import { researchFrontmatterSchema } from "@/lib/schema/research";
+import { writingFrontmatterSchema } from "@/lib/schema/writing";
 
 type SortableEntry = {
   slug: string;
@@ -60,11 +60,11 @@ export async function getProjectBySlug(slug: string): Promise<ProjectEntry | nul
   return projects.find((project) => project.slug === slug) ?? null;
 }
 
-export async function getAllResearchEntries(): Promise<ResearchEntry[]> {
-  return readCollectionEntries("research", researchFrontmatterSchema);
+export async function getAllWritingEntries(): Promise<WritingEntry[]> {
+  return readCollectionEntries("writing", writingFrontmatterSchema);
 }
 
-export async function getResearchBySlug(slug: string): Promise<ResearchEntry | null> {
-  const researchEntries = await getAllResearchEntries();
-  return researchEntries.find((entry) => entry.slug === slug) ?? null;
+export async function getWritingBySlug(slug: string): Promise<WritingEntry | null> {
+  const writingEntries = await getAllWritingEntries();
+  return writingEntries.find((entry) => entry.slug === slug) ?? null;
 }

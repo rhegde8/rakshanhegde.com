@@ -80,7 +80,7 @@ export function ProjectsClientView({ projects }: ProjectsClientViewProps): React
         ]}
       />
 
-      <p className="mb-4 font-mono text-xs text-[#6b7280]">
+      <p className="text-muted mb-4 font-mono text-xs">
         showing {filteredProjects.length} of {projects.length} projects.
       </p>
 

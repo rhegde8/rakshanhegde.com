@@ -21,7 +21,7 @@ Expected generated endpoints include:
 
 - `/sitemap.xml`
 - `/robots.txt`
-- `/research/rss.xml`
+- `/writing/rss.xml`
 - Site + legal + content-detail routes
 
 Pre-deploy local checks:
@@ -43,11 +43,12 @@ Pre-deploy local checks:
 ## 4) Post-deploy validation
 
 1. Route checks:
-   - `/`, `/projects`, `/research`, `/demos`, `/about`, `/privacy`, `/terms`
+   - `/`, `/lab`, `/lab/breach`, `/lab/descent`, `/projects`, `/writing`, `/about`, `/privacy`, `/terms`
+   - legacy redirect: `/research` → `/writing`
 2. Crawl checks:
    - `/robots.txt`
    - `/sitemap.xml`
-   - `/research/rss.xml`
+   - `/writing/rss.xml`
 3. SEO checks:
    - metadata tags
    - JSON-LD scripts

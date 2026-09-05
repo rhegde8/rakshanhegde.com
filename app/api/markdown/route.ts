@@ -3,11 +3,11 @@ import type { NextRequest } from "next/server";
 import {
   projectToMarkdown,
   projectsIndexMarkdown,
-  researchIndexMarkdown,
-  researchToMarkdown,
+  writingIndexMarkdown,
+  writingToMarkdown,
   siteOverviewMarkdown,
 } from "@/lib/content/markdown";
-import { getProjectBySlug, getResearchBySlug } from "@/lib/content/loaders";
+import { getProjectBySlug, getWritingBySlug } from "@/lib/content/loaders";
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
@@ -37,8 +37,8 @@ export async function GET(request: NextRequest): Promise<Response> {
     if (segments[0] === "projects") {
       return markdownResponse(await projectsIndexMarkdown());
     }
-    if (segments[0] === "research") {
-      return markdownResponse(await researchIndexMarkdown());
+    if (segments[0] === "writing") {
+      return markdownResponse(await writingIndexMarkdown());
     }
   }
 
@@ -49,10 +49,10 @@ export async function GET(request: NextRequest): Promise<Response> {
         return markdownResponse(projectToMarkdown(project));
       }
     }
-    if (segments[0] === "research") {
-      const entry = await getResearchBySlug(segments[1]!);
+    if (segments[0] === "writing") {
+      const entry = await getWritingBySlug(segments[1]!);
       if (entry) {
-        return markdownResponse(researchToMarkdown(entry));
+        return markdownResponse(writingToMarkdown(entry));
       }
     }
   }
