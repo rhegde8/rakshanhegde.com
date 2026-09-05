@@ -1,13 +1,17 @@
 import type { ReactNode } from "react";
 
+import { CommandPalette } from "@/components/CommandPalette";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { buildPaletteItems } from "@/lib/config/palette";
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: Readonly<{
   children: ReactNode;
-}>): React.JSX.Element {
+}>): Promise<React.JSX.Element> {
+  const paletteItems = await buildPaletteItems();
+
   return (
     <>
       <SiteHeader />
@@ -15,6 +19,7 @@ export default function SiteLayout({
         {children}
       </main>
       <SiteFooter />
+      <CommandPalette items={paletteItems} />
     </>
   );
 }

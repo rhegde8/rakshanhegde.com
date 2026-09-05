@@ -97,7 +97,7 @@ flowchart TD
 
 **Order of operations (conceptual):**
 
-1. **`proxy.ts`** — If `SITE_PASSWORD` is set, require HTTP Basic Auth; otherwise `NextResponse.next()`. Matcher skips `/_next/*` and `/favicon.ico`.
+1. **`proxy.ts`** — If `SITE_PASSWORD` is set, require HTTP Basic Auth; otherwise `NextResponse.next()`. Matcher skips `/_next/*` and `/favicon.ico`. After auth, content-page requests ending in `.md` (or sent with `Accept: text/markdown`) are rewritten to `/api/markdown` (see **Agent-native surface**).
 2. **`next.config.ts` `headers()`** — Global security headers + CSP from `lib/security/headers.ts` (applies broadly via `source: "/(.*)"`).
 3. **App Router** — Matched `app/**` segment renders (mostly Server Components) or invokes Route Handlers under `app/api/*` and `app/research/rss.xml/route.ts`.
 
@@ -118,6 +118,9 @@ Use this table when routing a task to the right file.
 | **Schemas**           | `lib/schema/*.ts`                          | Frontmatter + contact payload shapes                                                              |
 | **SEO helpers**       | `lib/seo/metadata.ts`, `lib/seo/jsonld.ts` | Page metadata and JSON-LD builders                                                                |
 | **Contact API**       | `app/api/contact/route.ts`                 | POST handler; gated by `ENABLE_CONTACT_FORM`; zod + rate limit                                    |
+| **Markdown API**      | `app/api/markdown/route.ts`                | Markdown versions of content pages (reached via proxy rewrite, not linked directly)               |
+| **llms.txt**          | `app/llms.txt/route.ts`                    | Agent-facing site overview generated from content                                                 |
+| **OG images**         | `app/opengraph-image.tsx` + per-slug files | Generated phosphor-terminal social cards via `lib/og/template.tsx` (`next/og`)                    |
 | **RSS**               | `app/research/rss.xml/route.ts`            | GET → RSS XML for research entries                                                                |
 | **Sitemap**           | `app/sitemap.ts`                           | Metadata route for sitemap                                                                        |
 | **Robots**            | `app/robots.ts`                            | Metadata route for robots.txt                                                                     |
@@ -147,6 +150,8 @@ Detail routes use **`generateStaticParams`** where applicable so slugs are known
 | **HTML (RSC)**                      | App Router pages → streamed/flight response to browser                   |
 | **401 + `WWW-Authenticate: Basic`** | `proxy.ts` when auth missing or invalid                                  |
 | **JSON**                            | `POST /api/contact` — success/error body from `app/api/contact/route.ts` |
+| **Markdown**                        | `GET /llms.txt`, `GET <content-path>.md`, `Accept: text/markdown`        |
+| **PNG (OG images)**                 | `GET /opengraph-image`, per-slug `opengraph-image` routes                |
 | **XML (RSS)**                       | `GET /research/rss.xml`                                                  |
 | **Metadata routes**                 | `GET` sitemap / robots via `app/sitemap.ts`, `app/robots.ts`             |
 | **Static assets**                   | `public/`, `_next/static` (bypassed by proxy matcher)                    |
@@ -162,14 +167,18 @@ Outbound **webhook** (optional): contact form POSTs to `CONTACT_FORM_WEBHOOK_URL
 | `app/`          | Routes, layouts, API & RSS Route Handlers, sitemap/robots                    |
 | `components/`   | UI; client components for search/filter, motion, contact form, MDX overrides |
 | `content/`      | Source of truth: `projects/`, `research/` MDX                                |
-| `lib/config/`   | Site copy and nav                                                            |
-| `lib/content/`  | Loaders and typed entry aliases                                              |
+| `lib/config/`   | Site copy, nav, command-palette items                                        |
+| `lib/content/`  | Loaders, typed entry aliases, markdown serializers                           |
 | `lib/schema/`   | Zod frontmatter + API schemas                                                |
-| `lib/search/`   | Fuzzy filter/scoring for list pages                                          |
+| `lib/search/`   | Fuzzy filter/scoring for list pages and command palette                      |
 | `lib/seo/`      | Metadata + JSON-LD                                                           |
 | `lib/security/` | CSP / security header definitions                                            |
+| `lib/terminal/` | Pure command engine for the interactive home-page terminal                   |
+| `lib/github/`   | Recent public GitHub activity fetch (ISR-cached, fails silent)               |
+| `lib/og/`       | Shared `next/og` template for generated social cards                         |
 | `lib/motion/`   | Motion timing/easing shared values                                           |
 | `lib/utils/`    | Small helpers (`cn`, dates)                                                  |
+| `assets/fonts/` | JetBrains Mono TTFs (OFL) read at build time for OG rendering                |
 | `tests/`        | Vitest unit/integration; Playwright in `tests/e2e/`                          |
 | `docs/`         | Deploy runbook + checklist only (architecture is this README)                |
 
@@ -209,8 +218,6 @@ flowchart LR
 2. `pnpm install` (runs Husky `prepare`).
 3. `cp .env.example .env.local` and set variables as needed.
 4. `pnpm dev` → [http://localhost:3000](http://localhost:3000).
-
-> **Dev-mode CSP note:** React emits a console warning about `eval()` being blocked. This is expected — the production CSP correctly omits `unsafe-eval`. React only uses `eval()` in development for stack trace reconstruction; it never uses it in production builds.
 
 ### E2E / Playwright
 
@@ -282,9 +289,30 @@ PR template at `.github/pull_request_template.md` — auto-populated on new PRs.
 
 ---
 
+## Interactive features
+
+- **Interactive terminal** (home page): `components/InteractiveTerminal.tsx` over a pure engine in `lib/terminal/commands.ts` (unit-tested). Commands: `help`, `whoami`, `focus`, `ls`, `cat <slug>`, `open <target>`, `contact`, `clear`, plus easter eggs. Tab completion, up/down history, `prefers-reduced-motion`-aware boot typing.
+- **Command palette**: `components/CommandPalette.tsx`, opened with `⌘K` / `Ctrl+K` or `/`. Fuzzy-searches pages, projects, research, and actions (items built server-side in `lib/config/palette.ts`, scoring via `lib/search/fuzzy.ts`).
+- **GitHub activity strip** (home page): recent public events for the configured GitHub account, fetched server-side with `revalidate: 3600`; the section renders nothing on error or empty feed.
+
+---
+
+## Agent-native surface
+
+The site is first-class for AI agents and scrapers:
+
+- **`/llms.txt`** — generated markdown overview of the whole site with links to markdown versions of every entry.
+- **`.md` suffix** — any content page (`/`, `/projects`, `/research`, and detail slugs) returns clean markdown when `.md` is appended, e.g. `/projects/<slug>.md`.
+- **Content negotiation** — the same pages return markdown when requested with `Accept: text/markdown`.
+
+Both are implemented as a proxy rewrite (`proxy.ts`, after Basic Auth) to `app/api/markdown/route.ts`, with serializers in `lib/content/markdown.ts`.
+
+---
+
 ## SEO & discovery
 
 - Per-page metadata helpers and JSON-LD (`Article` for research; `SoftwareSourceCode` for projects).
+- Generated OG images (phosphor terminal style) for the root and every project/research detail page via `next/og` — template in `lib/og/template.tsx`, fonts in `assets/fonts/`.
 - `app/robots.ts`, `app/sitemap.ts`.
 - RSS: `/research/rss.xml`.
 
@@ -292,7 +320,7 @@ PR template at `.github/pull_request_template.md` — auto-populated on new PRs.
 
 ## Security baseline
 
-- CSP + security headers: `lib/security/headers.ts` → `next.config.ts`. `unsafe-eval` is intentionally absent; React only needs it in dev.
+- CSP + security headers: `lib/security/headers.ts` → `next.config.ts`. Production omits `unsafe-eval`; dev adds it so React’s dev tooling can run under CSP.
 - Contact route: zod validation, env flags, in-memory IP rate limiting.
 - Optional **Basic Auth** in `proxy.ts` (timing-safe credential check via SHA-256 digest comparison — Edge-safe pattern).
 - No committed secrets.
