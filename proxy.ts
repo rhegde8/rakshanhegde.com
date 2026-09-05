@@ -40,10 +40,40 @@ function unauthorized(): NextResponse {
   });
 }
 
+/**
+ * Content pages that have a markdown representation via /api/markdown.
+ * `/` and the two collection roots, plus their detail slugs.
+ */
+const MARKDOWN_PATH = /^\/(?:(?:projects|research)(?:\/[a-z0-9-]+)?)?$/;
+
+function rewriteToMarkdown(request: NextRequest, targetPath: string): NextResponse {
+  const rewriteUrl = new URL("/api/markdown", request.url);
+  rewriteUrl.searchParams.set("path", targetPath);
+  const headers = new Headers(request.headers);
+  headers.set("x-markdown-path", targetPath);
+  return NextResponse.rewrite(rewriteUrl, { request: { headers } });
+}
+
+function markdownRewrite(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+
+  if (pathname.endsWith(".md")) {
+    const targetPath = pathname.slice(0, -3) || "/";
+    return MARKDOWN_PATH.test(targetPath) ? rewriteToMarkdown(request, targetPath) : null;
+  }
+
+  const accept = request.headers.get("accept") ?? "";
+  if (accept.includes("text/markdown") && MARKDOWN_PATH.test(pathname)) {
+    return rewriteToMarkdown(request, pathname);
+  }
+
+  return null;
+}
+
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const sitePassword = process.env.SITE_PASSWORD;
   if (sitePassword === undefined || sitePassword === "") {
-    return NextResponse.next();
+    return markdownRewrite(request) ?? NextResponse.next();
   }
 
   const expectedUser = process.env.SITE_USERNAME ?? "rakshan";
@@ -73,7 +103,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return unauthorized();
   }
 
-  return NextResponse.next();
+  return markdownRewrite(request) ?? NextResponse.next();
 }
 
 export const config = {

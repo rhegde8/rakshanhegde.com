@@ -1,7 +1,12 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import HomePage from "@/app/(site)/page";
+
+vi.mock("@/lib/github/activity", () => ({
+  getRecentGitHubActivity: async (): Promise<never[]> => [],
+  githubUsername: (): string => "rhegde8",
+}));
 import ProjectsPage from "@/app/(site)/projects/page";
 import ResearchPage from "@/app/(site)/research/page";
 
