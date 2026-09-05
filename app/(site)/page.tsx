@@ -1,10 +1,13 @@
 import Link from "next/link";
 
+import { GitHubActivity } from "@/components/GitHubActivity";
+import { InteractiveTerminal } from "@/components/InteractiveTerminal";
 import { MotionReveal } from "@/components/MotionReveal";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SectionHeading } from "@/components/SectionHeading";
-import { TerminalPanel } from "@/components/TerminalPanel";
-import { getFeaturedProjects } from "@/lib/content/loaders";
+import { getAllProjects, getAllResearchEntries } from "@/lib/content/loaders";
+import { getRecentGitHubActivity, githubUsername } from "@/lib/github/activity";
+import type { TerminalData } from "@/lib/terminal/commands";
 import { siteConfig } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -16,7 +19,21 @@ export const metadata = buildPageMetadata({
 });
 
 export default async function HomePage(): Promise<React.JSX.Element> {
-  const featuredProjects = await getFeaturedProjects();
+  const [projects, research, activityItems] = await Promise.all([
+    getAllProjects(),
+    getAllResearchEntries(),
+    getRecentGitHubActivity(),
+  ]);
+  const featuredProjects = projects.filter((project) => project.featured);
+  const terminalData: TerminalData = {
+    projects: projects.map(({ slug, title, summary, status }) => ({
+      slug,
+      title,
+      summary,
+      status,
+    })),
+    research: research.map(({ slug, title, summary }) => ({ slug, title, summary })),
+  };
 
   return (
     <div className="space-y-16 sm:space-y-20">
@@ -55,7 +72,7 @@ export default async function HomePage(): Promise<React.JSX.Element> {
       </MotionReveal>
 
       <MotionReveal delay={0.08}>
-        <TerminalPanel lines={siteConfig.terminalIntro} />
+        <InteractiveTerminal bootLines={siteConfig.terminalIntro} data={terminalData} />
       </MotionReveal>
 
       {featuredProjects.length > 0 ? (
@@ -78,6 +95,10 @@ export default async function HomePage(): Promise<React.JSX.Element> {
           </section>
         </MotionReveal>
       ) : null}
+
+      <MotionReveal delay={0.16}>
+        <GitHubActivity items={activityItems} username={githubUsername()} />
+      </MotionReveal>
     </div>
   );
 }
