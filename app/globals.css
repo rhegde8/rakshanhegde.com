@@ -7,6 +7,8 @@
   --muted: #656052;
   --accent: #883e32;
   --line: #b6ad9a;
+  /* Raised on wide screens; see the zoom steps near the media queries. */
+  --sheet-zoom: 1;
   --soft-line: #d7cebd;
   --font-serif: var(--font-editorial), Georgia, serif;
   --font-sans: var(--font-utility), Arial, sans-serif;
@@ -99,7 +101,8 @@ svg {
   position: relative;
   isolation: isolate;
   width: min(1280px, calc(100% - 56px));
-  min-height: 100vh;
+  /* vh is zoomed too, so divide it back out to keep the sheet one screen tall. */
+  min-height: calc(100vh / var(--sheet-zoom));
   margin: 24px auto;
   padding: 0 54px;
   background-color: var(--paper);
@@ -974,6 +977,40 @@ main {
 @media (min-width: 1400px) {
   .newspaper {
     margin-block: 34px;
+  }
+}
+.newspaper,
+.not-found {
+  zoom: var(--sheet-zoom);
+}
+/*
+ * The layout is sized in px for a ~1440px screen. On wider screens, scale the
+ * whole sheet so it keeps filling ~75-80% of the width instead of shrinking
+ * to a narrow column; zoom keeps type, figures and rules in proportion.
+ */
+@media (min-width: 1800px) {
+  :root {
+    --sheet-zoom: 1.15;
+  }
+}
+@media (min-width: 2100px) {
+  :root {
+    --sheet-zoom: 1.3;
+  }
+}
+@media (min-width: 2400px) {
+  :root {
+    --sheet-zoom: 1.5;
+  }
+}
+@media (min-width: 2800px) {
+  :root {
+    --sheet-zoom: 1.7;
+  }
+}
+@media (min-width: 3300px) {
+  :root {
+    --sheet-zoom: 2;
   }
 }
 @media (max-width: 1050px) {
