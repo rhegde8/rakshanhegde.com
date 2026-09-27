@@ -81,7 +81,7 @@ test("keyboard users can skip the masthead and navigate to projects", async ({ p
   await expect(page).toHaveURL(/\/projects$/);
 });
 
-for (const width of [320, 390, 1440]) {
+for (const width of [320, 390, 1440, 2560]) {
   test(`pages fit the viewport at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/", "/projects", "/projects/vultrack", "/writing", "/about"]) {
