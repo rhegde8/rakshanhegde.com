@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+import { type Dirent, promises as fs } from "node:fs";
 import path from "node:path";
 
 import matter from "gray-matter";
@@ -20,7 +20,15 @@ async function readCollectionEntries<T extends ContentMetadata>(
   schema: z.ZodType<T>,
 ): Promise<Array<T & { content: string; filePath: string }>> {
   const directoryPath = path.join(CONTENT_ROOT, collection);
-  const directoryEntries = await fs.readdir(directoryPath, { withFileTypes: true });
+  let directoryEntries: Dirent[];
+  try {
+    directoryEntries = await fs.readdir(directoryPath, { withFileTypes: true });
+  } catch (error) {
+    // Output file tracing only ships content files, so a collection with no
+    // entries yet (just .gitkeep) has no directory in a deployed function.
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw error;
+  }
 
   const files = directoryEntries.filter(
     (entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".mdx"),
