@@ -1,55 +1,30 @@
-# Production Checklist
+# Production checklist
 
-**Canonical stack, CI job name (`quality`), routes, and env reference:** **[`README.md`](../README.md)**. Use this file as a **checkbox runbook** only.
+Use the [README](../README.md) for commands and environment settings and the [deployment guide](deployment.md) for hosting steps.
 
-## Pre-launch quality
+## Local quality
 
-- [ ] `pnpm typecheck` passes
-- [ ] `pnpm lint` passes
-- [ ] `pnpm test` passes
-- [ ] `pnpm build` passes
-- [ ] `pnpm test:e2e` passes in CI
+- [ ] `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass.
+- [ ] `pnpm build` passes under Node 24.
+- [ ] `PLAYWRIGHT_USE_BUILD=true pnpm test:e2e` passes.
+- [ ] Desktop and mobile screenshots have been visually reviewed.
+- [ ] Keyboard navigation, focus indicators, zoom, and readable contrast are checked.
+- [ ] `pnpm audit` and `pnpm audit --prod` findings have been reviewed.
 
-## Content readiness
+## Content
 
-- [ ] Home hero copy finalized
-- [ ] Projects content reviewed and links verified
-- [ ] Research entries reviewed for clarity and references
-- [ ] Demo links and media verified
-- [ ] About/contact details updated from placeholders
+- [ ] Project claims and career history are accurate and approved for publication.
+- [ ] No sample articles, invented achievements, or old placeholder projects remain.
+- [ ] Contact and external links stay disabled until destinations are supplied.
+- [ ] No resume file, private contact data, credentials, or employer-confidential data are published.
+- [ ] Writing's empty state and empty RSS feed are intentional.
 
-## SEO and indexing
+## Hosting and discovery
 
-- [ ] `NEXT_PUBLIC_SITE_URL` points to production domain
-- [ ] `/sitemap.xml` returns all expected routes
-- [ ] `/robots.txt` allows crawl and references sitemap
-- [ ] JSON-LD present on home, research, and detail routes
-- [ ] Social preview metadata verified (Open Graph/Twitter)
-
-## Security and privacy
-
-- [ ] Response security headers present (CSP, HSTS, nosniff, frame deny)
-- [ ] No secrets committed to repository
-- [ ] Contact API disabled until webhook configured
-- [ ] Contact payload validation and rate-limit behavior verified
-- [ ] Privacy and Terms pages reviewed and customized
-
-## Analytics and observability
-
-- [ ] Vercel Analytics enabled intentionally (`NEXT_PUBLIC_ENABLE_ANALYTICS`)
-- [ ] Analytics events visible after deploy
-- [ ] Error monitoring plan documented (if external tool used)
-
-## Deployment and DNS
-
-- [ ] Vercel production deployment successful
-- [ ] Cloudflare DNS records point to Vercel
-- [ ] SSL/TLS set to Full (strict)
-- [ ] Domain/canonical redirects behave as expected
-
-## GitHub branch protection
-
-- [ ] Required check `quality` enforced on main branch
-- [ ] Pull request reviews required
-- [ ] Up-to-date branch requirement enabled
-- [ ] Force-push and branch deletion restrictions enabled
+- [ ] Vercel runtime is Node 24 and the intended environment variables are configured.
+- [ ] Basic Auth remains enabled until public launch is approved.
+- [ ] Production domain, canonical metadata, sitemap, RSS, and Markdown endpoints agree.
+- [ ] Removed routes return 404; legacy writing redirects work.
+- [ ] Security headers are present and production CSP omits `unsafe-eval`.
+- [ ] No unexpected third-party requests occur during page loads.
+- [ ] Deployment is approved and live routes, DNS, and TLS are verified afterward.

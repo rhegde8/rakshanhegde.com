@@ -10,6 +10,12 @@ updates:
     ignore:
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
+      # Types track the Node runtime (.node-version / engines 24.x); bump majors with the runtime.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # ESLint/typescript-eslint tooling does not support TypeScript 6+ yet; held at 5.9.x.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       frontend-runtime:
         patterns:

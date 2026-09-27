@@ -1,25 +1,17 @@
-import { cn } from "@/lib/utils/cn";
-
-type SectionHeadingProps = {
-  title: string;
-  subtitle?: string;
-  className?: string;
-};
-
-export function SectionHeading({
-  title,
-  subtitle,
-  className,
-}: SectionHeadingProps): React.JSX.Element {
+import Link from "next/link";
+type SectionHeadingProps = { title: string; number?: string; href?: string; linkLabel?: string };
+export function SectionHeading({ title, number, href, linkLabel }: SectionHeadingProps) {
   return (
-    <header className={cn("mb-6 space-y-2", className)}>
-      <h2 className="font-mono text-sm font-medium tracking-widest text-[#00ff88]">
-        {"// "}
+    <div className="section-heading">
+      <h2>
+        {number ? <span className="section-number">{number} / </span> : null}
         {title}
       </h2>
-      {subtitle ? (
-        <p className="max-w-3xl text-sm text-[#6b7280] sm:text-base">{subtitle}</p>
+      {href ? (
+        <Link href={href} className="text-link">
+          {linkLabel ?? "View all"} <span aria-hidden="true">↗</span>
+        </Link>
       ) : null}
-    </header>
+    </div>
   );
 }

@@ -29,6 +29,5 @@ export default async function OpengraphImage({
     label: "project",
     title: project.title,
     subtitle: project.summary,
-    command: `open projects/${project.slug}`,
   });
 }

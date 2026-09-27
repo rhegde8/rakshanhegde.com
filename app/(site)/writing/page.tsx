@@ -1,28 +1,40 @@
-import { JsonLdScript } from "@/components/JsonLdScript";
-import { SectionHeading } from "@/components/SectionHeading";
-import { WritingClientView } from "@/components/WritingClientView";
+import { WritingCard } from "@/components/WritingCard";
+import { WritingEmptyState } from "@/components/WritingEmptyState";
 import { getAllWritingEntries } from "@/lib/content/loaders";
-import { buildArticleJsonLd } from "@/lib/seo/jsonld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
-
 export const metadata = buildPageMetadata({
   title: "Writing",
   description:
-    "Essays and research notes on the future of AI, cybersecurity, and what it takes to ship systems that hold up.",
+    "Essays and field notes on software, AI, cybersecurity, and scientific curiosity by Rakshan Hegde.",
   path: "/writing",
 });
-
-export default async function WritingPage(): Promise<React.JSX.Element> {
+export default async function WritingPage() {
   const entries = await getAllWritingEntries();
-
   return (
-    <div className="space-y-6">
-      <SectionHeading
-        title="writing"
-        subtitle="Essays on where AI and security are heading, plus research notes from real system work."
-      />
-      <JsonLdScript data={entries.map((entry) => buildArticleJsonLd(entry))} />
-      <WritingClientView entries={entries} />
-    </div>
+    <>
+      <header className="page-heading">
+        <p className="eyebrow">Essays &amp; field notes</p>
+        <h1>
+          Thinking out loud.
+          <br />
+          <em>One page at a time.</em>
+        </h1>
+        <p>A place for things learned, questions still open, and ideas worth following.</p>
+      </header>
+      <section className="writing-index" aria-label="Writing">
+        {entries.length ? (
+          entries.map((entry) => <WritingCard key={entry.slug} entry={entry} />)
+        ) : (
+          <WritingEmptyState />
+        )}
+      </section>
+      <div className="notebook-topics">
+        <span className="eyebrow">On my mind</span>
+        <p>
+          Intelligent systems <span> / </span> Security <span> / </span> First principles{" "}
+          <span> / </span> The natural world
+        </p>
+      </div>
+    </>
   );
 }

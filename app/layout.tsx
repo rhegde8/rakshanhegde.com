@@ -1,31 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
-
+import localFont from "next/font/local";
 import { JsonLdScript } from "@/components/JsonLdScript";
 import { siteConfig } from "@/lib/config/site";
 import { buildPersonJsonLd, buildWebsiteJsonLd } from "@/lib/seo/jsonld";
-
 import "./globals.css";
 
-const bodyFont = Inter({
-  variable: "--font-body",
-  subsets: ["latin"],
+const editorial = localFont({
+  src: [
+    { path: "../assets/fonts/Newsreader.woff2", weight: "200 800", style: "normal" },
+    { path: "../assets/fonts/Newsreader-Italic.woff2", weight: "200 800", style: "italic" },
+  ],
+  variable: "--font-editorial",
   display: "swap",
 });
-
-const codeFont = JetBrains_Mono({
-  variable: "--font-code",
-  subsets: ["latin"],
+const utility = localFont({
+  src: "../assets/fonts/InstrumentSans.woff2",
+  weight: "400 700",
+  variable: "--font-utility",
   display: "swap",
 });
-
-const displayFont = Space_Grotesk({
-  variable: "--font-display",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
@@ -39,35 +32,27 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
     url: siteConfig.url,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    title: siteConfig.name,
     description: siteConfig.description,
   },
+  alternates: { types: { "application/rss+xml": "/writing/rss.xml" } },
 };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === "true";
-
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${bodyFont.variable} ${codeFont.variable} ${displayFont.variable} bg-bg text-text antialiased`}
-      >
+    <html lang="en" className={`${editorial.variable} ${utility.variable}`}>
+      <body>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
         <JsonLdScript data={[buildPersonJsonLd(), buildWebsiteJsonLd()]} />
         {children}
-        <div className="crt-overlay" aria-hidden="true" />
-        <div className="grain-overlay" aria-hidden="true" />
-        {analyticsEnabled ? <Analytics /> : null}
       </body>
     </html>
   );

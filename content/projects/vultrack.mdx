@@ -1,0 +1,32 @@
+---
+slug: vultrack
+title: VulTrack
+summary: A vulnerability management platform that turns scan results into clear priorities, remediation deadlines, and Board reporting.
+category: Security engineering
+context: Professional work
+status: in-use
+updatedAt: 2026-09-26
+stack:
+  - python
+  - flask
+  - sqlalchemy
+  - github actions
+tags:
+  - vulnerability management
+  - application security
+impact: Post-scan triage reduced from weeks to minutes.
+featured: true
+order: 1
+---
+
+## From scan results to action
+
+I built VulTrack to support the bank's vulnerability management and examination readiness. It ingests Tenable findings across 1,000 endpoints and servers, automates triage, and produces Board reporting.
+
+The platform tracks remediation against 15-day deadlines for Critical findings and 30-day deadlines for High findings. Post-scan triage went from weeks to minutes, replacing tools quoted at $65,000–$150,000 a year.
+
+## Security in the implementation
+
+VulTrack is built with Python, Flask, and SQLAlchemy. Its controls include role-based access, CSRF protection, credential hashing, secure sessions and uploads, and CSV-injection sanitization. Secrets handling fails closed.
+
+Continuous integration runs through GitHub Actions, with Dependabot for dependency updates.

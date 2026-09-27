@@ -1,33 +1,54 @@
 import { describe, expect, it } from "vitest";
 
-import { getAllProjects, getAllWritingEntries } from "@/lib/content/loaders";
+import {
+  getAllProjects,
+  getAllWritingEntries,
+  getProjectBySlug,
+  getWritingBySlug,
+} from "@/lib/content/loaders";
 import { projectFrontmatterSchema } from "@/lib/schema/project";
 import { writingFrontmatterSchema } from "@/lib/schema/writing";
 
-describe("content frontmatter schemas", () => {
-  it("validates project status and completion rules", () => {
-    const result = projectFrontmatterSchema.safeParse({
-      slug: "invalid-project",
-      title: "Invalid project",
-      summary: "This project is missing completedAt despite completed status.",
-      status: "completed",
-      startedAt: "2025-01-01",
-      updatedAt: "2025-01-02",
-      stack: ["typescript"],
-      tags: ["test"],
-      aiFocus: ["agents"],
-    });
+const project = {
+  slug: "security-workbench",
+  title: "Security workbench",
+  summary: "A local fixture for validating project metadata.",
+  category: "Security engineering",
+  context: "Personal project",
+  status: "ongoing",
+  updatedAt: "2026-09-26",
+  stack: ["Python", "python", "TypeScript"],
+  tags: ["security"],
+  impact: "Makes repeatable security checks possible.",
+  featured: true,
+  order: 1,
+};
 
-    expect(result.success).toBe(false);
+describe("content frontmatter schemas", () => {
+  it("accepts the project contract and normalizes duplicate stack names", () => {
+    const parsed = projectFrontmatterSchema.parse(project);
+    expect(parsed.stack).toEqual(["python", "typescript"]);
+    expect(parsed.status).toBe("ongoing");
   });
 
-  it("accepts writing metadata with optional fields", () => {
+  it.each([
+    { slug: "../outside" },
+    { status: "invented-status" },
+    { updatedAt: "not-a-date" },
+    { stack: [] },
+    { order: -1 },
+    { repoUrl: "https://example.com/unsupplied-link" },
+  ])("rejects invalid or unsupported metadata: %j", (invalid) => {
+    expect(projectFrontmatterSchema.safeParse({ ...project, ...invalid }).success).toBe(false);
+  });
+
+  it("accepts writing metadata without publishing a placeholder article", () => {
     const result = writingFrontmatterSchema.safeParse({
-      slug: "writing-entry",
-      title: "Writing entry",
-      summary: "A valid writing frontmatter payload for schema checks.",
-      updatedAt: "2025-10-01",
-      tags: ["rag", "evals"],
+      slug: "writing-fixture",
+      title: "Writing fixture",
+      summary: "A valid writing frontmatter payload used only by tests.",
+      updatedAt: "2026-09-26",
+      tags: ["security", "systems"],
       featured: true,
     });
 
@@ -35,23 +56,28 @@ describe("content frontmatter schemas", () => {
   });
 });
 
-describe("content loaders", () => {
-  it("loads and sorts project content by updatedAt descending", async () => {
+describe("published content", () => {
+  it("loads the three resume-backed projects in editorial order", async () => {
     const projects = await getAllProjects();
-    const first = projects[0];
-    const second = projects[1];
 
-    expect(projects.length).toBeGreaterThan(0);
-
-    if (first && second) {
-      expect(new Date(first.updatedAt).getTime()).toBeGreaterThanOrEqual(
-        new Date(second.updatedAt).getTime(),
-      );
-    }
+    expect(projects.map(({ slug }) => slug)).toEqual([
+      "vultrack",
+      "threatnet",
+      "multi-agent-development-harness",
+    ]);
+    expect(projects.map(({ order }) => order)).toEqual(
+      projects.map(({ order }) => order).toSorted((left, right) => left - right),
+    );
+    expect(projects.every(({ content }) => content.length > 0)).toBe(true);
   });
 
-  it("loads writing entries", async () => {
-    const writingEntries = await getAllWritingEntries();
-    expect(writingEntries.length).toBeGreaterThan(0);
+  it("leaves writing empty until a real article is added", async () => {
+    expect(await getAllWritingEntries()).toEqual([]);
+  });
+
+  it("returns null for missing and previously published placeholder slugs", async () => {
+    expect(await getProjectBySlug("rag-knowledge-orchestrator")).toBeNull();
+    expect(await getProjectBySlug("does-not-exist")).toBeNull();
+    expect(await getWritingBySlug("does-not-exist")).toBeNull();
   });
 });

@@ -1,0 +1,33 @@
+---
+slug: multi-agent-development-harness
+title: Multi-Agent Development Harness
+summary: A self-hosted coding system with builder and reviewer agents, human approval, and deliberately limited access to tools and credentials.
+category: Agent systems
+context: Personal project
+status: ongoing
+updatedAt: 2026-09-26
+stack:
+  - docker
+  - linux
+  - tailscale
+  - github
+tags:
+  - agent orchestration
+  - sandbox isolation
+  - least privilege
+impact: Isolated execution. Human approval. Credentials kept outside containers.
+featured: true
+order: 3
+---
+
+## A place for agents to build
+
+I built a self-hosted development harness where builder and reviewer agents work in phases under human approval. It runs on a hardened host, with containers used only to execute commands.
+
+## Keep authority explicit
+
+The agent loop stays on the host. No API key or Git credential enters an execution container.
+
+The reviewer holds no tokens. It returns a structured verdict, and the runner sets the checks. Deterministic gates, including mutation testing, run before any model call.
+
+The setup uses Docker, Tailscale, and GitHub. Sandbox isolation, least-privilege tool access, and human approval are part of how the system operates.

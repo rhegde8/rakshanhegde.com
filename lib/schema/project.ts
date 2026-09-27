@@ -7,30 +7,15 @@ export const projectFrontmatterSchema = z
     slug: slugSchema,
     title: z.string().trim().min(2),
     summary: z.string().trim().min(10),
-    status: z.enum(["ongoing", "completed"]),
-    startedAt: isoDateFromYamlSchema,
+    category: z.string().trim().min(2),
+    context: z.string().trim().min(2),
+    status: z.enum(["in-use", "ongoing"]),
     updatedAt: isoDateFromYamlSchema,
     stack: uniqueLowercaseList("stack"),
     tags: uniqueLowercaseList("tags"),
-    aiFocus: uniqueLowercaseList("aiFocus"),
-    completedAt: isoDateFromYamlSchema.optional(),
-    repoUrl: z.string().url().optional(),
-    liveUrl: z.string().url().optional(),
-    demoVideoUrl: z.string().url().optional(),
-    caseStudyUrl: z.string().url().optional(),
-    impact: z.string().trim().min(4).optional(),
-    role: z.string().trim().min(2).optional(),
-    teamSize: z.number().int().positive().optional(),
+    impact: z.string().trim().min(4),
     featured: z.boolean().optional().default(false),
-  })
-  .superRefine((project, context) => {
-    if (project.status === "completed" && !project.completedAt) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["completedAt"],
-        message: "completedAt is required when status is completed.",
-      });
-    }
+    order: z.number().int().nonnegative(),
   })
   .strict();
 

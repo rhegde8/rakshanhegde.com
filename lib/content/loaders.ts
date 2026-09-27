@@ -8,14 +8,14 @@ import type { ContentCollection, ProjectEntry, WritingEntry } from "@/lib/conten
 import { projectFrontmatterSchema } from "@/lib/schema/project";
 import { writingFrontmatterSchema } from "@/lib/schema/writing";
 
-type SortableEntry = {
+type ContentMetadata = {
   slug: string;
   updatedAt: string;
 };
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
-async function readCollectionEntries<T extends SortableEntry>(
+async function readCollectionEntries<T extends ContentMetadata>(
   collection: ContentCollection,
   schema: z.ZodType<T>,
 ): Promise<Array<T & { content: string; filePath: string }>> {
@@ -41,13 +41,14 @@ async function readCollectionEntries<T extends SortableEntry>(
     }),
   );
 
-  return entries.sort(
-    (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
-  );
+  return entries;
 }
 
 export async function getAllProjects(): Promise<ProjectEntry[]> {
-  return readCollectionEntries("projects", projectFrontmatterSchema);
+  const projects = await readCollectionEntries("projects", projectFrontmatterSchema);
+  return projects.sort(
+    (left, right) => left.order - right.order || left.slug.localeCompare(right.slug),
+  );
 }
 
 export async function getFeaturedProjects(): Promise<ProjectEntry[]> {
@@ -61,7 +62,10 @@ export async function getProjectBySlug(slug: string): Promise<ProjectEntry | nul
 }
 
 export async function getAllWritingEntries(): Promise<WritingEntry[]> {
-  return readCollectionEntries("writing", writingFrontmatterSchema);
+  const entries = await readCollectionEntries("writing", writingFrontmatterSchema);
+  return entries.sort(
+    (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
+  );
 }
 
 export async function getWritingBySlug(slug: string): Promise<WritingEntry | null> {
