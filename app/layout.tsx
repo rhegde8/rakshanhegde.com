@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLdScript } from "@/components/JsonLdScript";
 import { siteConfig } from "@/lib/config/site";
 import { buildPersonJsonLd, buildWebsiteJsonLd } from "@/lib/seo/jsonld";
@@ -53,6 +55,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <JsonLdScript data={[buildPersonJsonLd(), buildWebsiteJsonLd()]} />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
