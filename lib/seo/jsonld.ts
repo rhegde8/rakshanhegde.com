@@ -14,8 +14,6 @@ export function buildPersonJsonLd(): JsonLdObject {
     name: siteConfig.name,
     url: siteConfig.url,
     jobTitle: siteConfig.role,
-    email: `mailto:${siteConfig.email}`,
-    sameAs: siteConfig.socialLinks.map((link) => link.href),
   };
 }
 
@@ -56,8 +54,7 @@ export function buildProjectJsonLd(project: ProjectEntry): JsonLdObject {
     name: project.title,
     description: project.summary,
     dateModified: project.updatedAt,
-    programmingLanguage: project.stack.join(", "),
-    codeRepository: project.repoUrl ?? absoluteUrl(`/projects/${project.slug}`),
+    keywords: project.tags.join(", "),
     author: {
       "@type": "Person",
       name: siteConfig.name,

@@ -9,12 +9,12 @@ function absoluteUrl(path: string): string {
 export function projectToMarkdown(project: ProjectEntry): string {
   const meta = [
     `- Status: ${project.status}`,
-    `- Started: ${project.startedAt} · Updated: ${project.updatedAt}`,
+    `- Category: ${project.category}`,
+    `- Context: ${project.context}`,
+    `- Article updated: ${project.updatedAt}`,
     `- Stack: ${project.stack.join(", ")}`,
     `- Tags: ${project.tags.join(", ")}`,
-    `- AI focus: ${project.aiFocus.join(", ")}`,
-    ...(project.repoUrl ? [`- Repository: ${project.repoUrl}`] : []),
-    ...(project.impact ? [`- Impact: ${project.impact}`] : []),
+    `- Impact: ${project.impact}`,
     `- Canonical: ${absoluteUrl(`/projects/${project.slug}`)}`,
   ].join("\n");
 
@@ -52,7 +52,7 @@ export async function writingIndexMarkdown(): Promise<string> {
         `## [${entry.title}](${absoluteUrl(`/writing/${entry.slug}.md`)})\n\n${entry.summary}`,
     )
     .join("\n\n");
-  return `# Writing — ${siteConfig.name}\n\n${items}\n`;
+  return `# Writing — ${siteConfig.name}\n\n${items || "The first entry is still in the making."}\n`;
 }
 
 export async function siteOverviewMarkdown(): Promise<string> {
@@ -77,11 +77,8 @@ export async function siteOverviewMarkdown(): Promise<string> {
     `> ${siteConfig.description}`,
     "",
     `- Role: ${siteConfig.role}`,
-    `- Location: ${siteConfig.location}`,
-    `- Email: ${siteConfig.email}`,
-    ...siteConfig.socialLinks.map((social) => `- ${social.label}: ${social.href}`),
     "",
-    "Any page on this site can be fetched as markdown by appending `.md` to its path,",
+    "The home page, Projects, Writing, and their entries can be fetched as markdown by appending `.md` to their paths,",
     "or by sending an `Accept: text/markdown` header.",
     "",
     "## Projects",
@@ -90,7 +87,7 @@ export async function siteOverviewMarkdown(): Promise<string> {
     "",
     "## Writing",
     "",
-    writingLines,
+    writingLines || "The first entry is still in the making.",
     "",
     `RSS feed for writing: ${absoluteUrl("/writing/rss.xml")}`,
     "",

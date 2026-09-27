@@ -1,71 +1,27 @@
-# Deployment Guide
+# Deployment
 
-**Architecture, env var meanings, and security baseline:** see canonical **[`README.md`](../README.md)** and **`.env.example`**. This file is only the **deploy procedure** and post-deploy checks.
+See the [README](../README.md) for architecture, content authoring, and environment variables.
 
-## Target
+## Vercel setup
 
-- Hosting: Vercel Pro
-- DNS: Cloudflare
-- Runtime: Next.js App Router
+1. Select the Next.js framework preset and **Node.js 24.x** in project settings. Keep the selected major aligned with `.node-version` and `package.json`.
+2. Install with `pnpm install --frozen-lockfile`; build with `pnpm build`.
+3. Set `NEXT_PUBLIC_SITE_URL` to the canonical domain.
+4. Keep Basic Auth credentials in hosting settings. Remove `SITE_PASSWORD` only when the site is ready for public access.
 
-## 1) Vercel project setup
+Do not deploy until the local checks in the README and the production checklist have been reviewed. A source change does not itself authorize a deployment.
 
-1. Import repository into Vercel.
-2. Configure framework preset as Next.js.
-3. Set environment variables for Production and Preview to match **`README.md` → Environment variables** (and `.env.example`), including optional `SITE_USERNAME` / `SITE_PASSWORD` if you want Basic Auth on previews or production.
-4. Enable Vercel Analytics for the project if you use `NEXT_PUBLIC_ENABLE_ANALYTICS=true`.
+## Domain setup
 
-## 2) Build and output checks
+Add the custom domain in Vercel and use the DNS records it provides. If Cloudflare fronts the domain, retain Full (strict) TLS and verify that the canonical host redirects correctly.
 
-Expected generated endpoints include:
+## After deployment
 
-- `/sitemap.xml`
-- `/robots.txt`
-- `/writing/rss.xml`
-- Site + legal + content-detail routes
+- Check `/`, `/projects`, all three project details, `/writing`, and `/about` on desktop and mobile.
+- Confirm `/research` redirects to `/writing`; removed `/lab` and unknown content routes return 404.
+- Confirm contact labels have no live destinations and writing contains no sample posts.
+- Verify `/sitemap.xml`, `/robots.txt`, `/writing/rss.xml`, `/llms.txt`, and a project's `.md` response.
+- Inspect the canonical URL, title, social preview image, structured data, and response security headers.
+- If Basic Auth is enabled, confirm unauthenticated requests are rejected before HTML or Markdown is returned.
 
-Pre-deploy local checks:
-
-- `pnpm typecheck`
-- `pnpm lint`
-- `pnpm test`
-- `pnpm build`
-
-## 3) Cloudflare DNS configuration
-
-1. Add custom domain in Vercel.
-2. Add DNS records in Cloudflare as instructed by Vercel:
-   - apex/root: ALIAS/ANAME or CNAME flattening to Vercel target
-   - `www` subdomain: CNAME to Vercel target
-3. SSL/TLS mode: **Full (strict)**.
-4. Keep proxy mode consistent with Vercel recommendations.
-
-## 4) Post-deploy validation
-
-1. Route checks:
-   - `/`, `/lab`, `/lab/breach`, `/lab/descent`, `/projects`, `/writing`, `/about`, `/privacy`, `/terms`
-   - legacy redirect: `/research` → `/writing`
-2. Crawl checks:
-   - `/robots.txt`
-   - `/sitemap.xml`
-   - `/writing/rss.xml`
-3. SEO checks:
-   - metadata tags
-   - JSON-LD scripts
-4. Security checks:
-   - response headers/CSP present
-5. Analytics checks:
-   - event ingestion visible in Vercel dashboard
-
-## 5) Contact form rollout
-
-By default, keep form backend disabled:
-
-- `NEXT_PUBLIC_ENABLE_CONTACT_FORM=false`
-- `ENABLE_CONTACT_FORM=false`
-
-When ready:
-
-1. Configure secure webhook destination.
-2. Set both flags to `true`.
-3. Verify successful form relay and rate-limit behavior.
+Deployment and live-service validation are separate from local build and browser checks.

@@ -1,0 +1,29 @@
+---
+slug: threatnet
+title: ThreatNet
+summary: A threat-intelligence service that connects public feeds with asset inventory to surface the threats that need attention.
+category: Threat intelligence
+context: Professional work
+status: in-use
+updatedAt: 2026-09-26
+stack:
+  - python
+  - fastapi
+  - sqlalchemy
+tags:
+  - threat intelligence
+  - risk scoring
+impact: 700 daily records narrowed to 1–5 actionable items.
+featured: true
+order: 2
+---
+
+## Making intelligence relevant
+
+I built ThreatNet to correlate threat intelligence with the bank's asset inventory. The service brings together eight feeds, including CISA's Known Exploited Vulnerabilities catalog, the National Vulnerability Database, and FIRST's Exploit Prediction Scoring System.
+
+## Turning volume into priorities
+
+A custom risk score on a 0–100 scale narrows approximately 700 daily records to 1–5 actionable items. Correlating those records with asset inventory makes the output specific to the environment being protected.
+
+The service is built with Python, FastAPI, and SQLAlchemy.

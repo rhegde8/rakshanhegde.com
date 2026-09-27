@@ -6,22 +6,17 @@ export type SecurityHeader = {
 const isDev = process.env.NODE_ENV === "development";
 
 /** React dev uses eval() for stack reconstruction; production builds never need it. */
-const scriptSrcDirectives = [
-  "'self'",
-  "'unsafe-inline'",
-  "https://va.vercel-scripts.com",
-  ...(isDev ? ["'unsafe-eval'"] : []),
-];
+const scriptSrcDirectives = ["'self'", "'unsafe-inline'", ...(isDev ? ["'unsafe-eval'"] : [])];
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src ${scriptSrcDirectives.join(" ")}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://vitals.vercel-insights.com",
-  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
-  "media-src 'self' blob: https:",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "frame-src 'none'",
+  "media-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -55,3 +50,10 @@ export const securityHeaders: SecurityHeader[] = [
     value: "max-age=63072000; includeSubDomains; preload",
   },
 ];
+
+/** Password-protected content must never enter a shared CDN cache. */
+export function contentCacheControl(): string {
+  return process.env.SITE_PASSWORD
+    ? "private, no-store"
+    : "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
+}

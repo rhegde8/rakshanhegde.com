@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 const encoder = new TextEncoder();
 
 /**
- * Constant-time equality for two equal-length byte arrays (Edge-safe).
+ * Constant-time equality for two equal-length byte arrays.
  */
 function timingSafeEqualBytes(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) {
@@ -24,7 +24,6 @@ async function sha256Utf8(value: string): Promise<Uint8Array> {
 
 /**
  * Timing-safe string comparison via SHA-256 digests (fixed 32-byte compare).
- * Suitable for Edge middleware where Node's crypto.timingSafeEqual is unavailable.
  */
 async function timingSafeStringEqual(a: string, b: string): Promise<boolean> {
   const [digestA, digestB] = await Promise.all([sha256Utf8(a), sha256Utf8(b)]);
@@ -36,6 +35,7 @@ function unauthorized(): NextResponse {
     status: 401,
     headers: {
       "WWW-Authenticate": 'Basic realm="Restricted"',
+      "Cache-Control": "private, no-store",
     },
   });
 }
@@ -46,12 +46,51 @@ function unauthorized(): NextResponse {
  */
 const MARKDOWN_PATH = /^\/(?:(?:projects|writing)(?:\/[a-z0-9-]+)?)?$/;
 
+/**
+ * Proxy-owned request header carrying the markdown target to /api/markdown.
+ * Route handlers see the original URL after an internal rewrite, so the
+ * rewrite's `?path=` never reaches them; a request header does.
+ */
+const MARKDOWN_PATH_HEADER = "x-markdown-path";
+
 function rewriteToMarkdown(request: NextRequest, targetPath: string): NextResponse {
   const rewriteUrl = new URL("/api/markdown", request.url);
   rewriteUrl.searchParams.set("path", targetPath);
   const headers = new Headers(request.headers);
-  headers.set("x-markdown-path", targetPath);
+  headers.set(MARKDOWN_PATH_HEADER, targetPath);
   return NextResponse.rewrite(rewriteUrl, { request: { headers } });
+}
+
+/** Continue routing, dropping any client-supplied copy of the proxy-owned header. */
+function passThrough(request: NextRequest): NextResponse {
+  if (!request.headers.has(MARKDOWN_PATH_HEADER)) {
+    return NextResponse.next();
+  }
+  const headers = new Headers(request.headers);
+  headers.delete(MARKDOWN_PATH_HEADER);
+  return NextResponse.next({ request: { headers } });
+}
+
+function prefersMarkdown(accept: string): boolean {
+  const ranges = accept
+    .toLowerCase()
+    .split(",")
+    .map((range) => {
+      const [type, ...parameters] = range.trim().split(";");
+      const qualityParameter = parameters.find((parameter) => parameter.trim().startsWith("q="));
+      const quality = qualityParameter === undefined ? 1 : Number(qualityParameter.trim().slice(2));
+      return {
+        type: type?.trim(),
+        quality: Number.isFinite(quality) && quality >= 0 && quality <= 1 ? quality : 0,
+      };
+    });
+  const markdown = ranges.find((range) => range.type === "text/markdown");
+  if (!markdown || markdown.quality === 0) return false;
+
+  const html = ["text/html", "text/*", "*/*"]
+    .map((type) => ranges.find((range) => range.type === type))
+    .find((range) => range !== undefined);
+  return markdown.quality >= (html?.quality ?? 0);
 }
 
 function markdownRewrite(request: NextRequest): NextResponse | null {
@@ -63,23 +102,34 @@ function markdownRewrite(request: NextRequest): NextResponse | null {
   }
 
   const accept = request.headers.get("accept") ?? "";
-  if (accept.includes("text/markdown") && MARKDOWN_PATH.test(pathname)) {
+  if (prefersMarkdown(accept) && MARKDOWN_PATH.test(pathname)) {
     return rewriteToMarkdown(request, pathname);
   }
 
   return null;
 }
 
+function contentResponse(request: NextRequest, protectedSite: boolean): NextResponse {
+  const response = markdownRewrite(request) ?? passThrough(request);
+  if (MARKDOWN_PATH.test(request.nextUrl.pathname)) {
+    response.headers.append("Vary", "Accept");
+  }
+  if (protectedSite) {
+    response.headers.set("Cache-Control", "private, no-store");
+  }
+  return response;
+}
+
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const sitePassword = process.env.SITE_PASSWORD;
   if (sitePassword === undefined || sitePassword === "") {
-    return markdownRewrite(request) ?? NextResponse.next();
+    return contentResponse(request, false);
   }
 
   const expectedUser = process.env.SITE_USERNAME ?? "rakshan";
 
   const auth = request.headers.get("authorization");
-  if (auth === null || !auth.startsWith("Basic ")) {
+  if (auth === null || !/^Basic /i.test(auth)) {
     return unauthorized();
   }
 
@@ -103,7 +153,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return unauthorized();
   }
 
-  return markdownRewrite(request) ?? NextResponse.next();
+  return contentResponse(request, true);
 }
 
 export const config = {

@@ -1,54 +1,53 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import { InkStar } from "@/components/InkStar";
 import { siteConfig } from "@/lib/config/site";
-
-export function SiteHeader(): React.JSX.Element {
+export function SiteHeader() {
   const pathname = usePathname();
-
   return (
-    <header className="border-border bg-bg/85 sticky top-0 z-30 border-b backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <header className="masthead">
+      <div className="edition-line">
+        <span>An independent personal journal</span>
+        <span className="edition-motto">Perpetually curious. Always building.</span>
+      </div>
+      <div className="masthead-title">
+        <span className="masthead-aside">
+          Software &amp; security
+          <br />
+          <em>With a side of science.</em>
+        </span>
+        <Link href="/" className="nameplate">
+          Rakshan Hegde<span className="nameplate-period">.</span>
+        </Link>
+        <span className="masthead-seal" aria-hidden="true">
+          R
+          <span>
+            <InkStar />
+          </span>
+          H
+        </span>
+      </div>
+      <div className="navigation-line">
         <Link
           href="/"
-          className="text-accent glow-text flex items-center gap-2 font-mono text-sm font-semibold tracking-wide"
+          className="front-page-link"
+          aria-current={pathname === "/" ? "page" : undefined}
         >
-          <span aria-hidden="true" className="cursor-blink">
-            ▊
-          </span>
-          rakshan.hegde
+          <span aria-hidden="true">↖</span> Front page
         </Link>
-
-        <div className="flex items-center gap-4">
-          <span
-            className="text-muted-2 hidden items-center gap-1.5 font-mono text-[10px] sm:flex"
-            aria-hidden="true"
-          >
-            <span className="bg-success h-1.5 w-1.5 rounded-full" />
-            session: live
-          </span>
-
-          <nav aria-label="Main navigation" className="flex items-center gap-1 sm:gap-1.5">
-            {siteConfig.navItems.map((item) => {
-              const isActive =
-                item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`px-2 py-1 font-mono text-xs lowercase transition-colors sm:text-sm ${
-                    isActive ? "text-accent" : "text-muted hover:text-text"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+        <nav aria-label="Main navigation">
+          {siteConfig.navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={pathname.startsWith(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <span className="navigation-note">Made of questions &amp; coffee</span>
       </div>
     </header>
   );

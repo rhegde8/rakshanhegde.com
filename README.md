@@ -1,361 +1,111 @@
-# Rakshan Hegde — Personal Website
+# Rakshan Hegde
 
-Production-oriented personal site: **Next.js App Router**, **TypeScript (strict)**, **Tailwind CSS**, **Framer Motion**, **MDX** content in-repo. Deployed on **Vercel**; DNS often fronted by **Cloudflare**.
+A personal website for software engineering, AI, cybersecurity, and scientific curiosity. The design takes its cues from an old newspaper: warm paper, serif headlines, ink drawings, restrained burgundy accents, and generous reading space.
 
-## Single source of truth
+This README is the architecture and content-authoring reference. Deployment procedures live in [docs/deployment.md](docs/deployment.md).
 
-**This `README.md` is canonical** for stack, request flow, entry/exit points, directory map, rendering model, content rules, env vars, security baseline, CI, and "where to change what."
+## Stack
 
-Other files under `docs/` are **narrow runbooks** (deploy steps, checklists). They link back here and do not duplicate architecture—if something disagrees, **trust this README** and fix the doc.
+- Node **24.x**, selected by `.node-version` and `package.json`; pnpm version in `packageManager`.
+- Next.js 16 App Router, React 19, strict TypeScript, Tailwind CSS 4.
+- Server Components, local Newsreader and Instrument Sans fonts, CSS paper textures, and inline SVG illustrations.
+- Repository-owned MDX, parsed with `gray-matter`, validated by Zod, rendered with `next-mdx-remote`.
+- Vitest for content/security checks; Playwright with Chromium for browser behavior.
 
-**For LLMs / tools:** ingest this file first when mapping the codebase.
+There is no CMS or database. Contact and social links remain disabled placeholders until real destinations are supplied. Writing deliberately starts empty. The former Lab, terminal, command palette, contact API, and sample articles are removed.
 
----
+## Local development
 
-## Design goals
+Select Node 24 with your installed version manager, then:
 
-- Server Components by default for lean client bundles.
-- Git-based MDX with strict runtime validation (zod).
-- Search/filter only where needed (client islands).
-- Production-oriented SEO, security headers, optional analytics, and CI gates.
-
----
-
-## Design system
-
-Terminal / phosphor green aesthetic. Dark-only — no light mode.
-
-| Token      | Value     | Usage                                        |
-| ---------- | --------- | -------------------------------------------- |
-| `--bg`     | `#0c0c0c` | Page background                              |
-| `--panel`  | `#111111` | Card / surface background                    |
-| `--text`   | `#e2e8f0` | Primary text                                 |
-| `--muted`  | `#6b7280` | Secondary text, labels, timestamps           |
-| `--accent` | `#00ff88` | Phosphor green — CTAs, section labels, links |
-| `--border` | `#1e1e1e` | All borders (0.5px throughout)               |
-
-**Typography:** `JetBrains Mono` for all UI chrome (nav, headings, labels, terminal elements). `Inter` / system-sans for body and description text only.
-
-**Borders:** `0.5px solid #1e1e1e` throughout. No drop shadows. No background gradients.
-
-**Buttons:** ghost-green primary (`transparent` bg, `#00ff88` text + border) and ghost-gray secondary (`transparent` bg, `#2a2a2a` border).
-
-**Section labels:** `// label` format rendered in small green mono via `SectionHeading`.
-
-CSS variables and `@theme inline` mappings live in `app/globals.css`. Tailwind config is `tailwind.config.mjs`.
-
----
-
-## Stack (pinned intent)
-
-| Layer                | Choice                                                             |
-| -------------------- | ------------------------------------------------------------------ |
-| Framework            | Next.js **16** App Router (`next` 16.x)                            |
-| Language             | TypeScript strict                                                  |
-| Styling              | Tailwind v4, design tokens in CSS variables (phosphor green theme) |
-| Motion               | Framer Motion, `prefers-reduced-motion` aware                      |
-| Content              | Git-tracked MDX under `content/`                                   |
-| Parsing / validation | `gray-matter` + **zod** schemas in `lib/schema/`                   |
-| MDX render           | `next-mdx-remote` on detail pages (`components/MdxContent.tsx`)    |
-| Analytics            | `@vercel/analytics`, gated by env                                  |
-| Tests                | Vitest + Testing Library; Playwright e2e smoke                     |
-| Git hooks            | Husky (`prepare` in `package.json`)                                |
-
-Node: **20.x** (`package.json` `engines`; matches Vercel major). Package manager: **pnpm** (see CI).
-
----
-
-## Request flow (high level)
-
-Every incoming request hits **Next.js** first. The root **`proxy.ts`** (Next.js 16+ successor to `middleware.ts`) runs **only** for paths matched by its `config.matcher`; static framework assets are excluded.
-
-```mermaid
-flowchart TD
-  subgraph ingress [Ingress]
-    B[Browser / client]
-  end
-
-  subgraph edge [Next boundary]
-    P[proxy.ts optional Basic Auth]
-    R[Route handler / App Router page / Route Handler]
-  end
-
-  subgraph data [Server-side data]
-    L[lib/content/loaders.ts]
-    C[content/*.mdx]
-    FS[node:fs read at request or build time]
-  end
-
-  B --> P
-  P -->|401 + WWW-Authenticate| B
-  P -->|NextResponse.next| R
-  R --> L
-  L --> FS
-  C --> FS
-  R -->|HTML RSC payload / JSON / XML / headers| B
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-**Order of operations (conceptual):**
+Open `http://localhost:3000`. Optional local settings go in the ignored `.env.local` file.
 
-1. **`proxy.ts`** — If `SITE_PASSWORD` is set, require HTTP Basic Auth; otherwise `NextResponse.next()`. Matcher skips `/_next/*` and `/favicon.ico`. After auth, content-page requests ending in `.md` (or sent with `Accept: text/markdown`) are rewritten to `/api/markdown` (see **Agent-native surface**).
-2. **`next.config.ts` `headers()`** — Global security headers + CSP from `lib/security/headers.ts` (applies broadly via `source: "/(.*)"`).
-3. **App Router** — Matched `app/**` segment renders (mostly Server Components) or invokes Route Handlers under `app/api/*` and `app/writing/rss.xml/route.ts`.
+| Variable               | Behavior                                                        |
+| ---------------------- | --------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Canonical URL; defaults to `https://rakshanhegde.com`.          |
+| `SITE_USERNAME`        | Basic Auth username; defaults to `rakshan`.                     |
+| `SITE_PASSWORD`        | A nonempty value enables Basic Auth; unset means public access. |
 
----
+Store production credentials in hosting environment settings. Never put them in content, screenshots, logs, or source control.
 
-## Entry points (where work starts)
+## Where to change things
 
-Use this table when routing a task to the right file.
+| Path                                    | Responsibility                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| `app/(site)/page.tsx`                   | Newspaper front page.                                                     |
+| `app/(site)/projects/`                  | Project index and MDX detail pages.                                       |
+| `app/(site)/writing/`                   | Writing index, empty state, and future MDX articles.                      |
+| `app/(site)/about/page.tsx`             | Biography, experience, education, and interests.                          |
+| `lib/config/profile.ts`                 | Resume-backed experience and education.                                   |
+| `lib/config/site.ts`                    | Site identity, navigation, canonical URL, contact placeholders.           |
+| `app/globals.css`                       | Paper, ink, typography, layout, and responsive styles.                    |
+| `components/`                           | Masthead, footer, project cards, scientific illustrations, MDX elements.  |
+| `content/projects/`, `content/writing/` | Published MDX content.                                                    |
+| `lib/schema/`, `lib/content/`           | Content validation, loading, sorting, and Markdown serialization.         |
+| `lib/seo/`, `lib/og/`                   | Metadata, structured data, and social preview images.                     |
+| `proxy.ts`, `lib/security/headers.ts`   | Optional Basic Auth, Markdown negotiation, and response security headers. |
 
-| Kind                  | Path                                       | Role                                                                                              |
-| --------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| **Proxy (pre-route)** | `proxy.ts`                                 | Optional site-wide Basic Auth; `SITE_USERNAME` / `SITE_PASSWORD`                                  |
-| **Root layout**       | `app/layout.tsx`                           | `<html>`, fonts, global `metadata`, root JSON-LD (`Person`, `WebSite`), optional Vercel Analytics |
-| **Chrome layout**     | `app/(site)/layout.tsx`                    | `SiteHeader`, `<main>`, `SiteFooter` — route group `(site)` does **not** appear in URLs           |
-| **Site config**       | `lib/config/site.ts`                       | Name, nav, social links, email, `siteConfig.url` (from `NEXT_PUBLIC_SITE_URL` or fallback)        |
-| **Next config**       | `next.config.ts`                           | Security headers attachment                                                                       |
-| **Content load**      | `lib/content/loaders.ts`                   | Read `content/{projects,writing}/*.mdx`, parse frontmatter, zod validate, sort by `updatedAt`     |
-| **Lab experiments**   | `lib/lab/*.ts`, `components/lab/*`         | Client-only AI games: BREACH (prompt-injection) + DESCENT (gradient descent), plus the registry   |
-| **Schemas**           | `lib/schema/*.ts`                          | Frontmatter + contact payload shapes                                                              |
-| **SEO helpers**       | `lib/seo/metadata.ts`, `lib/seo/jsonld.ts` | Page metadata and JSON-LD builders                                                                |
-| **Contact API**       | `app/api/contact/route.ts`                 | POST handler; gated by `ENABLE_CONTACT_FORM`; zod + rate limit                                    |
-| **RSS**               | `app/writing/rss.xml/route.ts`             | GET → RSS XML for writing entries                                                                 |
-| **Sitemap**           | `app/sitemap.ts`                           | Metadata route for sitemap                                                                        |
-| **Robots**            | `app/robots.ts`                            | Metadata route for robots.txt                                                                     |
-| **404**               | `app/not-found.tsx`                        | Global not-found UI                                                                               |
+Public page routes are `/`, `/projects`, `/projects/[slug]`, `/writing`, `/writing/[slug]`, and `/about`. Legacy `/research` routes permanently redirect to `/writing` equivalents. Removed features and unknown content slugs return 404.
 
-**Pages (all under `app/(site)/` unless noted):**
+## Adding content
 
-| URL                | File                              |
-| ------------------ | --------------------------------- |
-| `/`                | `(site)/page.tsx`                 |
-| `/lab`             | `(site)/lab/page.tsx`             |
-| `/lab/breach`      | `(site)/lab/breach/page.tsx`      |
-| `/lab/descent`     | `(site)/lab/descent/page.tsx`     |
-| `/projects`        | `(site)/projects/page.tsx`        |
-| `/projects/[slug]` | `(site)/projects/[slug]/page.tsx` |
-| `/writing`         | `(site)/writing/page.tsx`         |
-| `/writing/[slug]`  | `(site)/writing/[slug]/page.tsx`  |
-| `/about`           | `(site)/about/page.tsx`           |
-| `/privacy`         | `(site)/privacy/page.tsx`         |
-| `/terms`           | `(site)/terms/page.tsx`           |
+Only trusted, reviewed files belong in `content/`: MDX is compiled code, not an upload format. Do not put confidential employer data or unpublished contact details in these files.
 
-Legacy `/research` and `/research/[slug]` URLs **301-redirect** to their `/writing` equivalents (`next.config.ts`).
+### Projects
 
-Detail routes use **`generateStaticParams`** where applicable so slugs are known at build time.
+Add `content/projects/<slug>.mdx`. Use the same kebab-case value for the filename and `slug`. The frontmatter schema is `lib/schema/project.ts`:
 
----
+| Field                      | Meaning                                                                       |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `slug`, `title`, `summary` | URL identifier, headline, and short description.                              |
+| `category`, `context`      | Discipline and where the work was undertaken.                                 |
+| `status`                   | `in-use` or `ongoing`.                                                        |
+| `updatedAt`                | Last editorial update as an ISO date; not an inferred project start date.     |
+| `stack`, `tags`            | Nonempty lists; normalized to lowercase and deduplicated.                     |
+| `impact`                   | A concise, substantiated outcome.                                             |
+| `featured`                 | Optional boolean, defaults to `false`; includes the project in selected work. |
+| `order`                    | Nonnegative integer; projects sort ascending, then by slug.                   |
 
-## Exit points (what leaves the app)
+Follow the existing VulTrack, ThreatNet, or Multi-Agent Development Harness entry for MDX body structure. Unsupported fields fail validation. External project links have no schema fields until real links are introduced deliberately.
 
-| Response type                       | Where                                                                    |
-| ----------------------------------- | ------------------------------------------------------------------------ |
-| **HTML (RSC)**                      | App Router pages → streamed/flight response to browser                   |
-| **401 + `WWW-Authenticate: Basic`** | `proxy.ts` when auth missing or invalid                                  |
-| **JSON**                            | `POST /api/contact` — success/error body from `app/api/contact/route.ts` |
-| **XML (RSS)**                       | `GET /writing/rss.xml`                                                   |
-| **Metadata routes**                 | `GET` sitemap / robots via `app/sitemap.ts`, `app/robots.ts`             |
-| **Static assets**                   | `public/`, `_next/static` (bypassed by proxy matcher)                    |
+### Writing
 
-Outbound **webhook** (optional): contact form POSTs to `CONTACT_FORM_WEBHOOK_URL` when backend form is enabled.
+Add `content/writing/<slug>.mdx` when a real article is ready. Required frontmatter: `slug`, `title`, `summary`, `updatedAt`, and nonempty `tags`. Optional fields: `hypothesis`, `findings`, URL `references`, and boolean `featured`. Entries sort by newest `updatedAt`.
 
----
+The empty directory is retained with `.gitkeep`. Adding the first entry populates the writing index and RSS feed. Update the tests that currently assert the intentional empty state and the three-project inventory when publishing new content.
 
-## Directory map (responsibilities)
+## Discovery and rendering
 
-| Directory       | Responsibility                                                               |
-| --------------- | ---------------------------------------------------------------------------- |
-| `app/`          | Routes, layouts, API & RSS Route Handlers, sitemap/robots                    |
-| `components/`   | UI; client components for search/filter, motion, contact form, MDX overrides |
-| `content/`      | Source of truth: `projects/`, `research/` MDX                                |
-| `lib/config/`   | Site copy, nav, command-palette items                                        |
-| `lib/content/`  | Loaders, typed entry aliases, markdown serializers                           |
-| `lib/schema/`   | Zod frontmatter + API schemas                                                |
-| `lib/search/`   | Fuzzy filter/scoring for list pages and command palette                      |
-| `lib/seo/`      | Metadata + JSON-LD                                                           |
-| `lib/security/` | CSP / security header definitions                                            |
-| `lib/terminal/` | Pure command engine for the interactive home-page terminal                   |
-| `lib/github/`   | Recent public GitHub activity fetch (ISR-cached, fails silent)               |
-| `lib/og/`       | Shared `next/og` template for generated social cards                         |
-| `lib/motion/`   | Motion timing/easing shared values                                           |
-| `lib/utils/`    | Small helpers (`cn`, dates)                                                  |
-| `assets/fonts/` | JetBrains Mono TTFs (OFL) read at build time for OG rendering                |
-| `tests/`        | Vitest unit/integration; Playwright in `tests/e2e/`                          |
-| `docs/`         | Deploy runbook + checklist only (architecture is this README)                |
+Content loaders read and validate local MDX on the server. Detail pages generate static parameters from the same collections used by navigation and metadata. Page layouts remain server-rendered; typography and paper effects do not require animation libraries.
 
----
+- `/sitemap.xml` lists current page and content routes.
+- `/robots.txt` publishes crawl rules and the sitemap location.
+- `/writing/rss.xml` is valid even when no writing has been published.
+- `/llms.txt` describes the site and links to Markdown content.
+- `/projects/<slug>.md` and `/writing/<slug>.md` return Markdown. The homepage and collection indexes also support `.md` and `Accept: text/markdown`.
 
-## Rendering & client boundaries
+The proxy applies Basic Auth before Markdown rewrites. Protected content uses `private, no-store` cache controls. Security headers are configured in `next.config.ts` from `lib/security/headers.ts`. Production CSP omits `unsafe-eval`; development includes it for tooling. Fonts and illustrations are local, and no analytics or third-party embeds are loaded.
 
-- **Default:** Server Components — data fetching via loaders in server `page.tsx` files.
-- **Client Components** (examples): `*ClientView.tsx` list/search UIs, `ContactForm`, `MotionReveal` and motion-enhanced cards.
-- **MDX body:** Detail pages render through `MdxContent` (`next-mdx-remote/rsc`) with `remark-gfm`, `rehype-highlight`, and internal `href` mapped to Next `Link`.
+## Verification
 
----
-
-## Content data flow (MDX → pages)
-
-```mermaid
-flowchart LR
-  F[content/*.mdx] --> M[gray-matter]
-  M --> Z[lib/schema zod]
-  Z --> L[lib/content/loaders.ts]
-  L --> R[app route pages]
-  R --> UI[components + SEO]
+```sh
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+pnpm exec playwright install chromium
+PLAYWRIGHT_USE_BUILD=true pnpm test:e2e
 ```
 
----
+`pnpm test:e2e` starts a dedicated server at `http://localhost:3100` with generated credentials shared only by that test run. It never reuses the development server or reads real credentials. Tracing is disabled to avoid capturing Authorization headers. `PLAYWRIGHT_USE_BUILD=true` tests the production build; CI uses production mode automatically. Without that flag, local E2E starts a development server.
 
-## Performance
+Browser tests check navigation, keyboard access, resume-backed project details, contact placeholders, removed routes, discovery endpoints, and overflow at 320, 390, and 1440 pixels. Future writing serialization is covered with an in-memory fixture, not a published sample article.
 
-- Server rendering and static params on detail routes keep client JS small.
-- Motion respects **`prefers-reduced-motion`**.
+`pnpm ci` runs typecheck, lint, Vitest, build, and E2E in order. GitHub Actions uses `.node-version` and installs Chromium with its Linux dependencies. On Arch Linux, use the system package manager if Chromium reports missing shared libraries; Playwright's dependency installer targets supported Debian/Ubuntu systems.
 
----
-
-## Local setup
-
-1. **Node** 20.x and **pnpm** (repo assumes pnpm; CI uses Node 20).
-2. `pnpm install` (runs Husky `prepare`).
-3. `cp .env.example .env.local` and set variables as needed.
-4. `pnpm dev` → [http://localhost:3000](http://localhost:3000).
-
-### E2E / Playwright
-
-CI: `pnpm exec playwright install --with-deps chromium`. On minimal or Arch-based systems, install OS libs if Chromium fails to start.
-
----
-
-## Environment variables
-
-Authoritative template: **`.env.example`**.
-
-| Variable                            | Purpose                                                        |
-| ----------------------------------- | -------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`              | Canonical URL (`metadataBase`, sitemap, OG, JSON-LD)           |
-| `NEXT_PUBLIC_ENABLE_ANALYTICS`      | `true` → Vercel `<Analytics />` in root layout                 |
-| `NEXT_PUBLIC_ENABLE_CONTACT_FORM`   | Show contact UI on About                                       |
-| `SITE_USERNAME`                     | Basic Auth user (default `rakshan` if unset)                   |
-| `SITE_PASSWORD`                     | If set (non-empty), enables site-wide Basic Auth in `proxy.ts` |
-| `ENABLE_CONTACT_FORM`               | Allow `POST /api/contact`                                      |
-| `CONTACT_FORM_WEBHOOK_URL`          | Webhook for submissions                                        |
-| `CONTACT_FORM_RATE_LIMIT_WINDOW_MS` | Rate-limit window (ms)                                         |
-| `CONTACT_FORM_RATE_LIMIT_MAX`       | Max POSTs per IP per window                                    |
-
-Secrets stay in **`.env.local`** (local) and **Vercel project settings** (production).
-
----
-
-## Content authoring
-
-MDX lives in:
-
-- `content/projects/*.mdx`
-- `content/writing/*.mdx`
-
-Pipeline: **read file** → **gray-matter** → **zod parse** (`lib/schema/*`) → **sort** by `updatedAt` desc → **detail pages** compile MDX via `next-mdx-remote`.
-
-### Project frontmatter (required)
-
-`slug`, `title`, `summary`, `status` (`ongoing` \| `completed`), `startedAt`, `updatedAt`, `stack[]`, `tags[]`, `aiFocus[]`.  
-`completed` → require `completedAt`. Optional `featured: true` to include on the home page preview (max 4 shown).
-
-### Research frontmatter (required)
-
-`slug`, `title`, `summary`, `updatedAt`, `tags[]`. Optional `hypothesis` and `findings` — both are shown inline on the research list card if present.
-
----
-
-## Scripts
-
-| Script                      | Action                                |
-| --------------------------- | ------------------------------------- |
-| `pnpm dev`                  | Dev server                            |
-| `pnpm build` / `pnpm start` | Production build / serve              |
-| `pnpm typecheck`            | `tsc --noEmit`                        |
-| `pnpm lint`                 | ESLint                                |
-| `pnpm format`               | Prettier                              |
-| `pnpm test`                 | Vitest                                |
-| `pnpm test:e2e`             | Playwright                            |
-| `pnpm test:e2e:ui`          | Playwright UI                         |
-| `pnpm ci`                   | typecheck → lint → test → build → e2e |
-
----
-
-## CI
-
-GitHub Actions: `.github/workflows/ci.yml`, job **`quality`** — checkout, pnpm install, typecheck, lint, vitest, build, Playwright chromium + e2e.
-
-PR template at `.github/pull_request_template.md` — auto-populated on new PRs.
-
----
-
-## Interactive features
-
-- **Interactive terminal** (home page): `components/InteractiveTerminal.tsx` over a pure engine in `lib/terminal/commands.ts` (unit-tested). Commands: `help`, `whoami`, `focus`, `ls`, `cat <slug>`, `open <target>`, `contact`, `clear`, plus easter eggs. Tab completion, up/down history, `prefers-reduced-motion`-aware boot typing.
-- **Command palette**: `components/CommandPalette.tsx`, opened with `⌘K` / `Ctrl+K` or `/`. Fuzzy-searches pages, projects, research, and actions (items built server-side in `lib/config/palette.ts`, scoring via `lib/search/fuzzy.ts`).
-- **GitHub activity strip** (home page): recent public events for the configured GitHub account, fetched server-side with `revalidate: 3600`; the section renders nothing on error or empty feed.
-
----
-
-## Agent-native surface
-
-The site is first-class for AI agents and scrapers:
-
-- **`/llms.txt`** — generated markdown overview of the whole site with links to markdown versions of every entry.
-- **`.md` suffix** — any content page (`/`, `/projects`, `/research`, and detail slugs) returns clean markdown when `.md` is appended, e.g. `/projects/<slug>.md`.
-- **Content negotiation** — the same pages return markdown when requested with `Accept: text/markdown`.
-
-Both are implemented as a proxy rewrite (`proxy.ts`, after Basic Auth) to `app/api/markdown/route.ts`, with serializers in `lib/content/markdown.ts`.
-
----
-
-## SEO & discovery
-
-- Per-page metadata helpers and JSON-LD (`Article` for writing; `SoftwareSourceCode` for projects).
-- `app/robots.ts`, `app/sitemap.ts`.
-- RSS: `/writing/rss.xml`.
-
----
-
-## Security baseline
-
-- CSP + security headers: `lib/security/headers.ts` → `next.config.ts`. Production omits `unsafe-eval`; dev adds it so React’s dev tooling can run under CSP.
-- Contact route: zod validation, env flags, in-memory IP rate limiting.
-- Optional **Basic Auth** in `proxy.ts` (timing-safe credential check via SHA-256 digest comparison — Edge-safe pattern).
-- No committed secrets.
-
----
-
-## Deployment (summary)
-
-1. Import repo into Vercel; set env vars.
-2. Custom domain in Vercel; Cloudflare DNS → Vercel target; SSL Full (strict).
-3. Smoke-test routes, sitemap/robots/RSS, headers, analytics if enabled.
-
-Details: **`docs/deployment.md`**.
-
----
-
-## Branch protection (recommended)
-
-On `main`: require PR, require **`quality`** CI success, up-to-date branch, no force-push.
-
----
-
-## Dependency rationale (short)
-
-- **next-mdx-remote:** MDX from repo files without bundling all MDX at edge cases in the main bundle.
-- **zod:** Runtime validation for content and API payloads.
-- **In-repo fuzzy search:** `lib/search/fuzzy.ts` avoids pulling a heavy search dependency.
-- **ESLint 9.x:** `eslint-plugin-react` (via `eslint-config-next`) does not yet support ESLint 10. The direct devDependency is pinned to **9.39.4**, and **`pnpm.overrides.eslint`** forces the same version for the whole graph so CI and Dependabot cannot resolve `eslint@10` until plugins catch up.
-
----
-
-## Related documentation (non-canonical)
-
-| File                           | Role                                               |
-| ------------------------------ | -------------------------------------------------- |
-| `docs/architecture.md`         | Pointer to this README (no duplicate architecture) |
-| `docs/deployment.md`           | Step-by-step Vercel + Cloudflare + validation      |
-| `docs/production-checklist.md` | Pre-ship checkbox list                             |
+Dependencies are audited with `pnpm audit` and `pnpm audit --prod`. Lockfile updates and audit overrides belong in the same review as their verification. No command here deploys the website.

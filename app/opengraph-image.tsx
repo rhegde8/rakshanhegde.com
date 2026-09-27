@@ -1,17 +1,12 @@
-import type { ImageResponse } from "next/og";
-
-import { siteConfig } from "@/lib/config/site";
 import { OG_SIZE, renderOgImage } from "@/lib/og/template";
-
-export const alt = `${siteConfig.name} — ${siteConfig.role}`;
+export const alt = "Rakshan Hegde — Software, security & a curious mind";
 export const size = OG_SIZE;
 export const contentType = "image/png";
-
-export default async function OpengraphImage(): Promise<ImageResponse> {
+export default async function OpengraphImage() {
   return renderOgImage({
-    label: "rakshan hegde",
-    title: "builds things that actually work.",
-    subtitle: siteConfig.role,
-    command: "whoami",
+    label: "The personal journal",
+    title: "Building systems. Finding their breaking points.",
+    subtitle:
+      "Software engineering, AI, cybersecurity, and a curiosity for how the universe works.",
   });
 }

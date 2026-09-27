@@ -8,6 +8,7 @@ import {
   siteOverviewMarkdown,
 } from "@/lib/content/markdown";
 import { getProjectBySlug, getWritingBySlug } from "@/lib/content/loaders";
+import { contentCacheControl } from "@/lib/security/headers";
 
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
@@ -15,7 +16,8 @@ function markdownResponse(body: string): Response {
   return new Response(body, {
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
-      "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
+      "Cache-Control": contentCacheControl(),
+      Vary: "Accept",
     },
   });
 }
@@ -23,6 +25,8 @@ function markdownResponse(body: string): Response {
 /**
  * Serves markdown versions of content pages. Reached via the proxy rewrite for
  * `<path>.md` URLs and `Accept: text/markdown` requests — not linked directly.
+ * The proxy sets `x-markdown-path` on rewrites and strips it from every other
+ * request, so it can be trusted here; `?path=` covers direct requests.
  */
 export async function GET(request: NextRequest): Promise<Response> {
   const path =

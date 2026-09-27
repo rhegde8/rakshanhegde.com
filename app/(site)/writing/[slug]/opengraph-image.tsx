@@ -29,6 +29,5 @@ export default async function OpengraphImage({
     label: "writing",
     title: entry.title,
     subtitle: entry.summary,
-    command: `open writing/${entry.slug}`,
   });
 }
