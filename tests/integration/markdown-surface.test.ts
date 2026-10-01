@@ -42,6 +42,7 @@ describe("content discovery", () => {
       expect(markdown).toContain(`- Status: ${project.status}`);
       expect(markdown).toContain(project.content);
       expect(markdown).not.toContain("- Repository:");
+      if (!project.stack.length) expect(markdown).not.toContain("- Stack:");
     }
   });
 
