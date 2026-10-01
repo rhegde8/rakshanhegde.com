@@ -11,7 +11,7 @@ export const projectFrontmatterSchema = z
     context: z.string().trim().min(2),
     status: z.enum(["in-use", "ongoing"]),
     updatedAt: isoDateFromYamlSchema,
-    stack: uniqueLowercaseList("stack"),
+    stack: uniqueLowercaseList("stack", 0).optional().default([]),
     tags: uniqueLowercaseList("tags"),
     impact: z.string().trim().min(4),
     featured: z.boolean().optional().default(false),

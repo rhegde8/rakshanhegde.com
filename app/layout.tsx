@@ -7,14 +7,6 @@ import { siteConfig } from "@/lib/config/site";
 import { buildPersonJsonLd, buildWebsiteJsonLd } from "@/lib/seo/jsonld";
 import "./globals.css";
 
-const editorial = localFont({
-  src: [
-    { path: "../assets/fonts/Newsreader.woff2", weight: "200 800", style: "normal" },
-    { path: "../assets/fonts/Newsreader-Italic.woff2", weight: "200 800", style: "italic" },
-  ],
-  variable: "--font-editorial",
-  display: "swap",
-});
 const utility = localFont({
   src: "../assets/fonts/InstrumentSans.woff2",
   weight: "400 700",
@@ -48,7 +40,7 @@ export const metadata: Metadata = {
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${editorial.variable} ${utility.variable}`}>
+    <html lang="en" className={utility.variable}>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content

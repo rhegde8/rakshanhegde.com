@@ -4,7 +4,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 export const metadata = buildPageMetadata({
   title: "Projects",
   description:
-    "Security platforms, threat intelligence, and agent orchestration. Selected engineering work by Rakshan Hegde.",
+    "SealCheck, agent orchestration, security platforms, and threat intelligence. Engineering work by Rakshan Hegde.",
   path: "/projects",
 });
 export default async function ProjectsPage() {
@@ -12,15 +12,15 @@ export default async function ProjectsPage() {
   return (
     <>
       <header className="page-heading">
-        <p className="eyebrow">The work / An evolving collection</p>
+        <p className="eyebrow">The work / Built &amp; being built</p>
         <h1>
           Built to solve
           <br />
           <em>something real.</em>
         </h1>
         <p>
-          Security platforms, useful automation, and experiments in agent orchestration. A few
-          things I’ve put into the world.
+          Production security platforms, sandbox preflight checks, and experiments in agent
+          orchestration. The questions, the systems, and the decisions behind them.
         </p>
       </header>
       <div className="collection-label">

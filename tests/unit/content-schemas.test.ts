@@ -35,11 +35,17 @@ describe("content frontmatter schemas", () => {
     { slug: "../outside" },
     { status: "invented-status" },
     { updatedAt: "not-a-date" },
-    { stack: [] },
+    { stack: [""] },
+    { tags: [] },
     { order: -1 },
     { repoUrl: "https://example.com/unsupplied-link" },
   ])("rejects invalid or unsupported metadata: %j", (invalid) => {
     expect(projectFrontmatterSchema.safeParse({ ...project, ...invalid }).success).toBe(false);
+  });
+
+  it("allows an undisclosed stack without inventing technologies", () => {
+    expect(projectFrontmatterSchema.parse({ ...project, stack: undefined }).stack).toEqual([]);
+    expect(projectFrontmatterSchema.parse({ ...project, stack: [] }).stack).toEqual([]);
   });
 
   it("accepts writing metadata without publishing a placeholder article", () => {
@@ -57,13 +63,14 @@ describe("content frontmatter schemas", () => {
 });
 
 describe("published content", () => {
-  it("loads the three resume-backed projects in editorial order", async () => {
+  it("loads current work followed by production projects", async () => {
     const projects = await getAllProjects();
 
     expect(projects.map(({ slug }) => slug)).toEqual([
+      "sealcheck",
+      "multi-agent-development-harness",
       "vultrack",
       "threatnet",
-      "multi-agent-development-harness",
     ]);
     expect(projects.map(({ order }) => order)).toEqual(
       projects.map(({ order }) => order).toSorted((left, right) => left - right),

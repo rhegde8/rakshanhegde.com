@@ -22,7 +22,9 @@ export default defineConfig({
     trace: "off",
   },
   webServer: {
-    command: useProductionBuild ? "pnpm start --port 3100" : "pnpm dev --port 3100",
+    command: useProductionBuild
+      ? "node node_modules/next/dist/bin/next start --port 3100"
+      : "node node_modules/next/dist/bin/next dev --port 3100",
     url: testOrigin,
     env: { SITE_USERNAME: "playwright", SITE_PASSWORD: testPassword },
     reuseExistingServer: false,

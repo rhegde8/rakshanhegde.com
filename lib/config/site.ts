@@ -1,9 +1,9 @@
 export const siteConfig = {
   name: "Rakshan Hegde",
-  role: "Software Engineer",
-  tagline: "Software, security & a curious mind",
+  role: "Senior Security Engineer",
+  tagline: "Software, AI & security",
   description:
-    "The personal journal of Rakshan Hegde. Software engineering, AI, cybersecurity, and a curiosity for how the universe works. Projects, writing, and field notes.",
+    "The personal systems lab of Rakshan Hegde. Building software, exploring AI, and investigating how systems break. Projects and field notes on AI and cybersecurity.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://rakshanhegde.com",
   navItems: [
     { label: "Projects", href: "/projects" },
@@ -11,9 +11,9 @@ export const siteConfig = {
     { label: "About", href: "/about" },
   ],
   contactLinks: [
-    { label: "Email", href: null },
-    { label: "GitHub", href: null },
-    { label: "LinkedIn", href: null },
+    { label: "Email", href: "mailto:rakshan.hegde7@gmail.com" },
+    { label: "GitHub", href: "https://github.com/rhegde8" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/rakshan-hegde" },
   ],
   keywords: ["Rakshan Hegde", "Software Engineer", "AI", "Cybersecurity", "Agent orchestration"],
 } as const;

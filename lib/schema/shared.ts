@@ -14,9 +14,9 @@ export const isoDateFromYamlSchema = z
     message: "Date must be ISO compatible.",
   });
 
-export function uniqueLowercaseList(name: string): z.ZodType<string[]> {
+export function uniqueLowercaseList(name: string, minimum = 1): z.ZodType<string[]> {
   return z
     .array(z.string().trim().min(1))
-    .min(1, `${name} cannot be empty`)
+    .min(minimum, `${name} cannot be empty`)
     .transform((items) => [...new Set(items.map((item) => item.toLowerCase()))]);
 }

@@ -8,9 +8,12 @@ export const experience = [
     ],
     summary: "Building security platforms and the controls AI systems operate under.",
     highlights: [
-      "Authored the bank's AI Security Standard, including agent tool permissions, autonomy limits, and human approval requirements.",
-      "Established the AI Core Committee, lead AI tool security reviews, and manage two engineers.",
-      "Built VulTrack and ThreatNet; took Microsoft 365 Copilot from a 25-user pilot to a rollout for 400 employees.",
+      "Authored the bank’s AI Security Standard across nine control domains, including agent tool permissions, autonomy limits, and human approval requirements.",
+      "Established the AI Core Committee, lead the security review for every AI tool entering the bank, and manage two engineers.",
+      "Wrote AI vendor due-diligence requirements and an 11-clause contract bundle covering data handling, monitoring, and auditability.",
+      "Built VulTrack and ThreatNet; took Microsoft 365 Copilot from a 25-user pilot to an approved bank-wide rollout.",
+      "Own bank-wide application security and work with IT on AWS guardrails, infrastructure review, and automated misconfiguration detection.",
+      "Automated reporting across 32 risk categories and access recertifications, and built a versioned 700-control library.",
     ],
   },
   {
@@ -29,7 +32,7 @@ export const experience = [
     roles: [{ title: "Operations and Expansion Lead", period: "2014–2020" }],
     summary: "An earlier chapter in building and running businesses, before software engineering.",
     highlights: [
-      "Grew the business from two hotels and three restaurants to three hotels and six restaurants, with 434 employees.",
+      "Grew the business from two hotels and three restaurants to three hotels and six restaurants, with 350+ employees.",
       "Led a 30-room hotel build from land acquisition through opening, alongside finance, HR, vendors, and technology.",
     ],
   },

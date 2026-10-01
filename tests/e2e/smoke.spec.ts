@@ -1,19 +1,18 @@
 import { expect, test } from "@playwright/test";
 
 const projects = [
+  { slug: "sealcheck", title: "SealCheck" },
   { slug: "vultrack", title: "VulTrack" },
   { slug: "threatnet", title: "ThreatNet" },
   { slug: "multi-agent-development-harness", title: /multi.agent development harness/i },
 ] as const;
 
-test("front page presents the engineer and three editorial navigation links", async ({ page }) => {
+test("home presents the builder and project navigation", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Finding their breaking points.",
-  );
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("systems break.");
   const navigation = page.getByRole("navigation").first();
   await expect(navigation.getByRole("link")).toHaveText(["Projects", "Writing", "About"]);
   await expect(page.getByRole("link", { name: /^Rakshan Hegde/ }).first()).toHaveAttribute(
@@ -46,18 +45,24 @@ test("writing honestly starts empty and the legacy index redirects", async ({ pa
   ).toHaveCount(0);
 });
 
-test("about retains real experience and keeps contact links as placeholders", async ({ page }) => {
+test("about reflects the latest resume and real contact links", async ({ page }) => {
   await page.goto("/about");
   await expect(page.getByRole("main")).toContainText("Sumitomo Mitsui Trust Bank");
   await expect(page.getByRole("main")).toContainText("11:11 Systems");
-  for (const label of ["Email", "GitHub", "LinkedIn"]) {
-    const placeholder = page.locator('[aria-disabled="true"]').filter({ hasText: label }).first();
-    await expect(placeholder).toBeVisible();
-    await expect(placeholder).not.toHaveAttribute("href");
+  await expect(page.getByRole("main")).toContainText("350+ employees");
+  await expect(page.getByRole("main")).toContainText("approved bank-wide rollout");
+  await expect(page.getByRole("main")).not.toContainText("434 employees");
+  await expect(page.getByRole("main")).not.toContainText("400 employees");
+  for (const [label, href] of [
+    ["Email", "mailto:rakshan.hegde7@gmail.com"],
+    ["GitHub", "https://github.com/rhegde8"],
+    ["LinkedIn", "https://www.linkedin.com/in/rakshan-hegde"],
+  ] as const) {
+    await expect(page.getByRole("main").getByRole("link", { name: label }).first()).toHaveAttribute(
+      "href",
+      href,
+    );
   }
-  await expect(
-    page.locator('a[href^="mailto:"], a[href*="github.com"], a[href*="linkedin.com"]'),
-  ).toHaveCount(0);
 });
 
 test("keyboard users can skip the masthead and navigate to projects", async ({ page }) => {
@@ -84,7 +89,13 @@ test("keyboard users can skip the masthead and navigate to projects", async ({ p
 for (const width of [320, 390, 1440, 2560]) {
   test(`pages fit the viewport at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ["/", "/projects", "/projects/vultrack", "/writing", "/about"]) {
+    for (const path of [
+      "/",
+      "/projects",
+      ...projects.map(({ slug }) => `/projects/${slug}`),
+      "/writing",
+      "/about",
+    ]) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       const dimensions = await page.evaluate(() => ({
@@ -162,4 +173,90 @@ test("markdown, RSS, and sitemap describe the same published work", async ({ req
   expect(feed.ok()).toBe(true);
   expect(feed.headers()["content-type"]).toContain("application/rss+xml");
   expect(await feed.text()).not.toContain("<item>");
+});
+
+test("systems explorer switches projects and explains selected components", async ({ page }) => {
+  await page.goto("/");
+  const explorer = page.getByRole("region", { name: "Explore my systems" });
+  const choices = explorer.getByRole("group", { name: "Choose a project" });
+  await expect(choices.getByRole("button", { name: "SealCheck", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  for (const [label, slug, title] of [
+    ["SealCheck", "sealcheck", "SealCheck"],
+    ["Agent harness", "multi-agent-development-harness", "Multi-Agent Development Harness"],
+    ["VulTrack", "vultrack", "VulTrack"],
+    ["ThreatNet", "threatnet", "ThreatNet"],
+  ] as const) {
+    await choices.getByRole("button", { name: label, exact: true }).click();
+    await expect(explorer.getByRole("heading", { level: 2 })).toHaveText(title);
+    await expect(explorer.getByRole("link", { name: "Explore project" })).toHaveAttribute(
+      "href",
+      `/projects/${slug}`,
+    );
+    const components = explorer.locator(".diagram-node");
+    for (const component of await components.all()) {
+      await component.focus();
+      await page.keyboard.press("Enter");
+      await expect(component).toHaveAttribute("aria-pressed", "true");
+      const label = await component.locator("strong").innerText();
+      await expect(explorer.locator(".inspector-label")).toHaveText(label);
+    }
+  }
+});
+
+test("mobile taps reveal SealCheck components without overlapping controls", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/projects/sealcheck");
+  const nodes = page.locator(".diagram-node");
+  const boxes = await nodes.evaluateAll((items) =>
+    items.map((item) => {
+      const { top, bottom, width, height } = item.getBoundingClientRect();
+      return { top, bottom, width, height };
+    }),
+  );
+  expect(boxes).toHaveLength(3);
+  for (const [index, box] of boxes.entries()) {
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    const previous = boxes[index - 1];
+    if (previous) expect(box.top).toBeGreaterThan(previous.bottom);
+  }
+  await nodes.last().click();
+  await expect(page.locator(".system-inspector")).toContainText("before the model enters");
+  await expect(page.getByRole("main")).not.toContainText("Built with");
+});
+
+test("reduced motion removes transitions while retaining interaction", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const button = page
+    .getByRole("group", { name: "Choose a project" })
+    .getByRole("button", { name: "ThreatNet" });
+  await button.click();
+  await expect(page.locator(".explorer-heading")).toContainText("ThreatNet");
+  expect(await button.evaluate((element) => getComputedStyle(element).transitionDuration)).toBe(
+    "0s",
+  );
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+  test("project summaries, links, and diagram explanations remain readable", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("experiment with AI");
+    await expect(page.getByRole("group", { name: "Choose a project" })).not.toBeVisible();
+    for (const project of projects) {
+      await expect(
+        page.locator(`#selected-work a[href="/projects/${project.slug}"]`),
+      ).toBeVisible();
+    }
+    await page.goto("/projects/sealcheck");
+    await expect(page.locator(".system-fallback")).toBeVisible();
+    await expect(page.locator(".system-fallback")).toContainText(/preflight assessment/i);
+    await expect(
+      page.getByRole("heading", { name: "Before the model enters", exact: true }),
+    ).toBeVisible();
+  });
 });
