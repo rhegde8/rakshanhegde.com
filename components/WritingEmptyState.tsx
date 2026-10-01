@@ -2,7 +2,7 @@ export function WritingEmptyState() {
   return (
     <div className="writing-empty">
       <span className="printing-mark" aria-hidden="true">
-        ¶
+        [ ]
       </span>
       <div>
         <h3>The next page is still unwritten.</h3>

@@ -12,7 +12,7 @@ export function projectToMarkdown(project: ProjectEntry): string {
     `- Category: ${project.category}`,
     `- Context: ${project.context}`,
     `- Article updated: ${project.updatedAt}`,
-    `- Stack: ${project.stack.join(", ")}`,
+    ...(project.stack.length ? [`- Stack: ${project.stack.join(", ")}`] : []),
     `- Tags: ${project.tags.join(", ")}`,
     `- Impact: ${project.impact}`,
     `- Canonical: ${absoluteUrl(`/projects/${project.slug}`)}`,

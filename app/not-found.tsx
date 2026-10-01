@@ -8,9 +8,9 @@ export default function NotFound() {
         <br />
         <em>got away.</em>
       </h1>
-      <p>It may have moved, or it may never have made it to print.</p>
+      <p>This address doesn’t point to a project or a page in the lab.</p>
       <Link href="/" className="underlined-link">
-        Back to the front page <span aria-hidden="true">↗</span>
+        Back to the lab <span aria-hidden="true">↗</span>
       </Link>
     </main>
   );
