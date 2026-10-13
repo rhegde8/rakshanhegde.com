@@ -7,6 +7,10 @@ on:
       - main
       - master
 
+# CI only reads the repo; pin the token so it can't widen if the repo default changes.
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
